@@ -23,14 +23,54 @@ model User {
   status         String   @default("active") // e.g., "active", "banned", "inactive"
 
   // Relationships
-  matches       Match[] // Matches with other users
-  likes         Like[] // Likes sent to other users
-  receivedLikes Like[] // Likes received from other users
-  messages      Message[] // Messages sent/received
+  // matches       Match[] // Matches with other users
+  // likes         Like[] // Likes sent to other users
+  // receivedLikes Like[] // Likes received from other users
+  // Message[] // Messages sent/received
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
   preferences  Json // E.g., gender, age range, distance for matching
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  igUrl        String? // Instagram URL
+  // Photo        Photo[]
 }
+
+// model Match {
+//   id         Int       @id @default(autoincrement())
+//   user1Id    Int
+//   user2Id    Int
+//   matchedAt  DateTime  @default(now())
+//   isActive   Boolean   @default(true) // Whether the match is still active
+//   user1      User      @relation(fields: [user1Id], references: [id])
+//   user2      User      @relation(fields: [user2Id], references: [id])
+// }
+
+// model Like {
+//   id         Int      @id @default(autoincrement())
+//   senderId   Int
+//   receiverId Int
+//   sentAt     DateTime @default(now())
+//   sender     User     @relation(fields: [senderId], references: [id])
+//   receiver   User     @relation(fields: [receiverId], references: [id])
+// }
+
+// model Message {
+//   id         Int       @id @default(autoincrement())
+//   senderId   Int
+//   receiverId Int
+//   content    String
+//   sentAt     DateTime  @default(now())
+//   isRead     Boolean   @default(false)
+//   sender     User      @relation(fields: [senderId], references: [id])
+//   receiver   User      @relation(fields: [receiverId], references: [id])
+// }
+
+// model Photo {
+//   id         Int      @id @default(autoincrement())
+//   userId     Int
+//   url        String
+//   uploadedAt DateTime @default(now())
+//   user       User     @relation(fields: [userId], references: [id])
+// }
