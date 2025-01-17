@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id
+  username       String   @unique
+  email          String   @unique
+  password       String
+  firstName      String
+  lastName       String
+  gender         String // e.g., "Male", "Female", "Non-Binary"
+  birthdate      DateTime
+  bio            String? // Optional short bio
+  profilePicture String? // URL of the profile picture
+  location       String // Current location (e.g., city or coordinates)
+  interests      String[] // Array of user interests or hobbies
+  status         String   @default("active") // e.g., "active", "banned", "inactive"
+
+  // Relationships
+  matches       Match[] // Matches with other users
+  likes         Like[] // Likes sent to other users
+  receivedLikes Like[] // Likes received from other users
+  messages      Message[] // Messages sent/received
+
+  // Activity & Preferences
+  onlineStatus Boolean  @default(false) // Whether the user is currently online
+  preferences  Json // E.g., gender, age range, distance for matching
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
