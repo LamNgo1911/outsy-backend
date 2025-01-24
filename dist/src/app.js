@@ -30,8 +30,4 @@ app.use("/users", userRoutes_1.default); // https://localhost:8000/users
 // app.use('/dashboard', dashboardRouter); // https://localhost:8000/dashboard
 // app.use('/products', productRouter); // https://localhost:8000/products
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
-/* SERVER */
-const port = Number(process.env.PORT) || 8000;
-app.listen(port, "0.0.0.0", () => {
-    console.log(`Server running on port ${port}`);
-});
+exports.default = app;
