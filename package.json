@@ -1,9 +1,13 @@
 {
   "name": "outsy-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "ts-node prisma/seed.ts",
+    "build": "rimraf dist && npx tsc",
+    "start": "npm run build && node dist/app.js",
+    "dev": "npm run build && concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/app.ts\""
   },
   "keywords": [],
   "author": "",
@@ -11,19 +15,20 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "body-parser": "^1.20.3",
-    "concurrently": "^9.1.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "prisma": "^5.22.0",
+    "body-parser": "^1.20.3",
+    "concurrently": "^9.1.0",
     "helmet": "^8.0.0",
     "morgan": "^1.10.0",
-    "prisma": "^5.22.0",
     "rimraf": "^6.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.7",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
