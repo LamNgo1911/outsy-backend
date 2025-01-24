@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Users {
   id             String   @id
   username       String   @unique
   email          String   @unique
@@ -37,7 +37,7 @@ model User {
   // Photo        Photo[]
 }
 
-// model Match {
+// model Matches {
 //   id         Int       @id @default(autoincrement())
 //   user1Id    Int
 //   user2Id    Int
@@ -47,7 +47,7 @@ model User {
 //   user2      User      @relation(fields: [user2Id], references: [id])
 // }
 
-// model Like {
+// model Likes {
 //   id         Int      @id @default(autoincrement())
 //   senderId   Int
 //   receiverId Int
@@ -56,7 +56,7 @@ model User {
 //   receiver   User     @relation(fields: [receiverId], references: [id])
 // }
 
-// model Message {
+// model Messages {
 //   id         Int       @id @default(autoincrement())
 //   senderId   Int
 //   receiverId Int
@@ -67,7 +67,7 @@ model User {
 //   receiver   User      @relation(fields: [receiverId], references: [id])
 // }
 
-// model Photo {
+// model Photos {
 //   id         Int      @id @default(autoincrement())
 //   userId     Int
 //   url        String
