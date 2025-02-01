@@ -7,26 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
+model User {
   id             String   @id
   username       String   @unique
   email          String   @unique
   password       String
   firstName      String
   lastName       String
-  gender         String // e.g., "Male", "Female", "Non-Binary"
+  gender         String
   birthdate      DateTime
-  bio            String? // Optional short bio
-  profilePicture String? // URL of the profile picture
-  location       String // Current location (e.g., city or coordinates)
-  interests      String[] // Array of user interests or hobbies
+  bio            String?
+  profilePicture String?
+  location       String
+  interests      String[]
   status         String   @default("active") // e.g., "active", "banned", "inactive"
+  chats          Chat[]   @relation("UserChat")
 
   // Relationships
   // matches       Match[] // Matches with other users
   // likes         Like[] // Likes sent to other users
   // receivedLikes Like[] // Likes received from other users
-  // Message[] // Messages sent/received
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
@@ -35,6 +35,23 @@ model Users {
   updatedAt    DateTime @updatedAt
   igUrl        String? // Instagram URL
   // Photo        Photo[]
+}
+
+model Chat {
+  id       String    @id @default(cuid())
+  users    User[]    @relation("UserChat")
+  messages Message[] @relation("ChatMessage")
+}
+
+model Message {
+  id       Int      @id @default(autoincrement())
+  chatId   String
+  senderId String
+  content  String
+  sentAt   DateTime @default(now())
+  isRead   Boolean  @default(false)
+
+  chat Chat @relation("ChatMessage", fields: [chatId], references: [id])
 }
 
 // model Matches {
@@ -54,17 +71,6 @@ model Users {
 //   sentAt     DateTime @default(now())
 //   sender     User     @relation(fields: [senderId], references: [id])
 //   receiver   User     @relation(fields: [receiverId], references: [id])
-// }
-
-// model Messages {
-//   id         Int       @id @default(autoincrement())
-//   senderId   Int
-//   receiverId Int
-//   content    String
-//   sentAt     DateTime  @default(now())
-//   isRead     Boolean   @default(false)
-//   sender     User      @relation(fields: [senderId], references: [id])
-//   receiver   User      @relation(fields: [receiverId], references: [id])
 // }
 
 // model Photos {
