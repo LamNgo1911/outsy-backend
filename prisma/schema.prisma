@@ -80,3 +80,25 @@ model Message {
 //   uploadedAt DateTime @default(now())
 //   user       User     @relation(fields: [userId], references: [id])
 // }
+
+model Event {
+  id      Int      @id @default(autoincrement())
+  hostId  Int
+  name    String
+  date    DateTime
+  guestId Int
+  venueId String
+  status  Status
+}
+
+enum Status {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+model Venue {
+  id      String @id @default(cuid())
+  name    String
+  address String
+}

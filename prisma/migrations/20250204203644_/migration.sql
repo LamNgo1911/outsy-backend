@@ -1,11 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Users` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "Users";
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('OPEN', 'CLOSED', 'CANCELLED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -34,7 +28,6 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Chat" (
     "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
 );
@@ -52,11 +45,33 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
-CREATE TABLE "_UserChats" (
+CREATE TABLE "Event" (
+    "id" SERIAL NOT NULL,
+    "hostId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "guestId" INTEGER NOT NULL,
+    "venueId" TEXT NOT NULL,
+    "status" "Status" NOT NULL,
+
+    CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Venue" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+
+    CONSTRAINT "Venue_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "_UserChat" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
 
-    CONSTRAINT "_UserChats_AB_pkey" PRIMARY KEY ("A","B")
+    CONSTRAINT "_UserChat_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -66,13 +81,13 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "_UserChats_B_index" ON "_UserChats"("B");
+CREATE INDEX "_UserChat_B_index" ON "_UserChat"("B");
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "Chat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_UserChats" ADD CONSTRAINT "_UserChats_A_fkey" FOREIGN KEY ("A") REFERENCES "Chat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_UserChat" ADD CONSTRAINT "_UserChat_A_fkey" FOREIGN KEY ("A") REFERENCES "Chat"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_UserChats" ADD CONSTRAINT "_UserChats_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_UserChat" ADD CONSTRAINT "_UserChat_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
