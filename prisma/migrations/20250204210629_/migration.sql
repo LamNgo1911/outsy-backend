@@ -25,6 +25,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Chat" (
     "id" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
 );
