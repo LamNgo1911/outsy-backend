@@ -1,0 +1,77 @@
+[
+  {
+    "id": "user_12345",
+    "username": "john_doe",
+    "email": "johndoe@example.com",
+    "password": "$2b$10$abcdefg1234567890hash",
+    "firstName": "John",
+    "lastName": "Doe",
+    "gender": "Male",
+    "birthdate": "1995-06-15T00:00:00.000Z",
+    "bio": "Software developer and coffee enthusiast.",
+    "profilePicture": "https://example.com/profile/john_doe.jpg",
+    "location": "Helsinki, Finland",
+    "interests": ["coding", "travel", "music", "photography"],
+    "status": "active",
+    "chats": [],
+    "onlineStatus": true,
+    "preferences": {
+      "gender": "Female",
+      "ageRange": [22, 30],
+      "distance": 50
+    },
+    "createdAt": "2025-02-04T12:00:00.000Z",
+    "updatedAt": "2025-02-04T12:30:00.000Z",
+    "igUrl": "https://instagram.com/johndoe"
+  },
+  {
+    "id": "user_67890",
+    "username": "jane_smith",
+    "email": "janesmith@example.com",
+    "password": "$2b$10$hijklmn9876543210hash",
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "gender": "Female",
+    "birthdate": "1998-09-25T00:00:00.000Z",
+    "bio": "Love hiking and reading books.",
+    "profilePicture": "https://example.com/profile/jane_smith.jpg",
+    "location": "Stockholm, Sweden",
+    "interests": ["hiking", "reading", "yoga", "meditation"],
+    "status": "active",
+    "chats": [],
+    "onlineStatus": false,
+    "preferences": {
+      "gender": "Male",
+      "ageRange": [25, 35],
+      "distance": 100
+    },
+    "createdAt": "2025-02-04T13:00:00.000Z",
+    "updatedAt": "2025-02-04T13:45:00.000Z",
+    "igUrl": "https://instagram.com/janesmith"
+  },
+  {
+    "id": "user_54321",
+    "username": "mike_jordan",
+    "email": "mikejordan@example.com",
+    "password": "$2b$10$pqrstuv0987654321hash",
+    "firstName": "Mike",
+    "lastName": "Jordan",
+    "gender": "Male",
+    "birthdate": "1992-12-05T00:00:00.000Z",
+    "bio": "Basketball lover and foodie.",
+    "profilePicture": "https://example.com/profile/mike_jordan.jpg",
+    "location": "New York, USA",
+    "interests": ["basketball", "cooking", "gaming", "travel"],
+    "status": "banned",
+    "chats": [],
+    "onlineStatus": false,
+    "preferences": {
+      "gender": "Female",
+      "ageRange": [20, 32],
+      "distance": 30
+    },
+    "createdAt": "2025-02-04T14:00:00.000Z",
+    "updatedAt": "2025-02-04T14:20:00.000Z",
+    "igUrl": []
+  }
+]
