@@ -55,6 +55,7 @@ export const createUser = async (
       preferences,
       igUrl,
     } = req.body;
+
     const newUser = await prisma.user.create({
       data: {
         id: uuidv4(),
