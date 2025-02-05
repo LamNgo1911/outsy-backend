@@ -36,12 +36,21 @@ function deleteAllData(orderedFileNames) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const dataDirectory = path_1.default.join(__dirname, "data");
-        const orderedFileNames = ["users.json"];
-        yield deleteAllData(orderedFileNames);
-        for (const fileName of orderedFileNames) {
+        const dataDirectory = path_1.default.join(__dirname, 'data');
+        // const jsonFiles = [
+        //   'user.json',
+        //   'chat.json',
+        //   'userChat.json',
+        //   'message.json',
+        // ];
+        // Get all files in the directory
+        const allFiles = fs_1.default.readdirSync(dataDirectory);
+        // Filter to get only the .json files
+        const jsonFiles = allFiles.filter((file) => path_1.default.extname(file) === '.json');
+        yield deleteAllData(jsonFiles);
+        for (const fileName of jsonFiles) {
             const filePath = path_1.default.join(dataDirectory, fileName);
-            const jsonData = JSON.parse(fs_1.default.readFileSync(filePath, "utf-8"));
+            const jsonData = JSON.parse(fs_1.default.readFileSync(filePath, 'utf-8'));
             const modelName = path_1.default.basename(fileName, path_1.default.extname(fileName));
             const model = prisma[modelName];
             if (!model) {
