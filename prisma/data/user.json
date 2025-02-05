@@ -11,9 +11,8 @@
     "bio": "Software developer and coffee enthusiast.",
     "profilePicture": "https://example.com/profile/john_doe.jpg",
     "location": "Helsinki, Finland",
-    "interests": ["coding", "travel", "music", "photography"],
+    "interests": ["coding", "travel", "music"],
     "status": "active",
-    "chats": [],
     "onlineStatus": true,
     "preferences": {
       "gender": "Female",
@@ -36,9 +35,8 @@
     "bio": "Love hiking and reading books.",
     "profilePicture": "https://example.com/profile/jane_smith.jpg",
     "location": "Stockholm, Sweden",
-    "interests": ["hiking", "reading", "yoga", "meditation"],
+    "interests": ["hiking", "reading", "yoga"],
     "status": "active",
-    "chats": [],
     "onlineStatus": false,
     "preferences": {
       "gender": "Male",
@@ -50,28 +48,27 @@
     "igUrl": "https://instagram.com/janesmith"
   },
   {
-    "id": "user_54321",
-    "username": "mike_jordan",
-    "email": "mikejordan@example.com",
-    "password": "$2b$10$pqrstuv0987654321hash",
-    "firstName": "Mike",
-    "lastName": "Jordan",
+    "id": "user_11223",
+    "username": "michael_johnson",
+    "email": "michaeljohnson@example.com",
+    "password": "$2b$10$xyz1234567890hash",
+    "firstName": "Michael",
+    "lastName": "Johnson",
     "gender": "Male",
-    "birthdate": "1992-12-05T00:00:00.000Z",
-    "bio": "Basketball lover and foodie.",
-    "profilePicture": "https://example.com/profile/mike_jordan.jpg",
-    "location": "New York, USA",
-    "interests": ["basketball", "cooking", "gaming", "travel"],
-    "status": "banned",
-    "chats": [],
-    "onlineStatus": false,
+    "birthdate": "1990-02-15T00:00:00.000Z",
+    "bio": "Love photography and nature.",
+    "profilePicture": "https://example.com/profile/michael_johnson.jpg",
+    "location": "Oslo, Norway",
+    "interests": ["photography", "nature", "travelling"],
+    "status": "active",
+    "onlineStatus": true,
     "preferences": {
       "gender": "Female",
-      "ageRange": [20, 32],
-      "distance": 30
+      "ageRange": [25, 35],
+      "distance": 100
     },
     "createdAt": "2025-02-04T14:00:00.000Z",
-    "updatedAt": "2025-02-04T14:20:00.000Z",
-    "igUrl": []
+    "updatedAt": "2025-02-04T14:15:00.000Z",
+    "igUrl": "https://instagram.com/michaeljohnson"
   }
 ]
