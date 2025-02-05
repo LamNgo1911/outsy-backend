@@ -7,7 +7,7 @@
     "seed": "ts-node prisma/seed.ts",
     "build": "rimraf dist && npx tsc",
     "start": "node ts-node server.ts",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec ts-node src/server.ts"
+    "dev": "npm run build && concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/server.ts\""
   },
   "keywords": [],
   "author": "",

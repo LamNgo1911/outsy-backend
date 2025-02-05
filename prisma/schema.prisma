@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id             String   @id
+  id             String   @id @default(cuid())
   username       String   @unique
   email          String   @unique
   password       String
@@ -21,12 +21,6 @@ model User {
   location       String
   interests      String[]
   status         String   @default("active") // e.g., "active", "banned", "inactive"
-  chats          Chat[]   @relation("UserChat")
-
-  // Relationships
-  // matches       Match[] // Matches with other users
-  // likes         Like[] // Likes sent to other users
-  // receivedLikes Like[] // Likes received from other users
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
@@ -35,25 +29,42 @@ model User {
   updatedAt    DateTime @updatedAt
   igUrl        String? // Instagram URL
   // Photo        Photo[]
+
+  // Relationships
+  chats UserChat[]
+  // matches       Match[] // Matches with other users
+  // likes         Like[] // Likes sent to other users
+  // receivedLikes Like[] // Likes received from other users
 }
 
 model Chat {
-  id       String    @id @default(cuid())
-  users    User[]    @relation("UserChat")
+  id       String  @id @default(cuid())
+  isActive Boolean @default(true)
+  // createdAt DateTime   @default(now())
+
+  users    UserChat[]
   messages Message[]
-  isActive Boolean   @default(true)
-  // createdAt DateTime  @default(now())
+}
+
+model UserChat {
+  userId String
+  chatId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@id([userId, chatId]) // Composite primary key 
 }
 
 model Message {
-  id       Int      @id @default(autoincrement())
+  id       String   @id @default(cuid())
   chatId   String
   senderId String
   content  String
   sentAt   DateTime @default(now())
   isRead   Boolean  @default(false)
 
-  chat Chat @relation(fields: [chatId], references: [id])
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 }
 
 // model Matches {
