@@ -31,7 +31,8 @@ model User {
   // Photo        Photo[]
 
   // Relationships
-  chats UserChat[]
+  chats  UserChat[]
+  hostEvents Event[]
   // matches       Match[] // Matches with other users
   // likes         Like[] // Likes sent to other users
   // receivedLikes Like[] // Likes received from other users
@@ -95,13 +96,17 @@ model Message {
 // }
 
 model Event {
-  id      Int      @id @default(autoincrement())
-  hostId  Int
+  id      String   @id @default(cuid())
+  hostId  String
   name    String
   date    DateTime
-  guestId Int
+  guestId String
   venueId String
   status  Status   @default(OPEN)
+
+  //relation
+  host User @relation(fields: [hostId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
 }
 
 enum Status {
@@ -114,4 +119,7 @@ model Venue {
   id      String @id @default(cuid())
   name    String
   address String
+
+  //relation
+  events Event[]
 }
