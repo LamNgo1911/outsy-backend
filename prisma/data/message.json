@@ -1,0 +1,50 @@
+[
+  {
+    "id": "hihi",
+    "chatId": "chat_1001",
+    "senderId": "user_12345",
+    "content": "Hey Jane! How are you?",
+    "sentAt": "2025-02-04T14:10:00.000Z",
+    "isRead": false
+  },
+  {
+    "id": "kokoko",
+    "chatId": "chat_1001",
+    "senderId": "user_67890",
+    "content": "Hey John! I'm doing great. How about you?",
+    "sentAt": "2025-02-04T14:11:00.000Z",
+    "isRead": false
+  },
+  {
+    "id": "kakaka",
+    "chatId": "chat_1001",
+    "senderId": "user_12345",
+    "content": "Good. Thank you",
+    "sentAt": "2025-02-04T16:00:00.000Z",
+    "isRead": false
+  },
+  {
+    "id": "hahaha",
+    "chatId": "chat_1001",
+    "senderId": "user_67890",
+    "content": "Are you free on Sunday?",
+    "sentAt": "2025-02-04T17:05:00.000Z",
+    "isRead": false
+  },
+  {
+    "id": "5",
+    "chatId": "chat_1002",
+    "senderId": "user_12345",
+    "content": "Are we meeting tomorrow?",
+    "sentAt": "2025-02-04T12:10:00.000Z",
+    "isRead": false
+  },
+  {
+    "id": "6",
+    "chatId": "chat_1002",
+    "senderId": "user_67890",
+    "content": "Yes, let's confirm at 3 PM.",
+    "sentAt": "2025-02-04T12:15:00.000Z",
+    "isRead": false
+  }
+]
