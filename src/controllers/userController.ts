@@ -7,7 +7,10 @@ const prisma = new PrismaClient();
 // Get all users
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: { chats: true }, // This will include chats in the response
+    });
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving users" });
@@ -51,6 +54,7 @@ export const createUser = async (
       location,
       interests,
       status,
+      chats,
       onlineStatus,
       preferences,
       igUrl,
@@ -71,13 +75,16 @@ export const createUser = async (
         location,
         interests,
         status,
+        chats: { connect: [] },
         onlineStatus,
         preferences,
         igUrl,
       },
+      include: { chats: true }, // Ensures `chats` is included in the response
     });
     res.status(201).json(newUser);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating user" });
   }
 };
