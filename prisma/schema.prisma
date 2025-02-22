@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  ACTIVE
+  BANNED
+  INACTIVE
+}
+
 model User {
   id             String   @id @default(cuid())
   username       String   @unique
@@ -20,7 +26,7 @@ model User {
   profilePicture String?
   location       String
   interests      String[]
-  status         String   @default("active") // e.g., "active", "banned", "inactive"
+  status         Status // e.g., "active", "banned", "inactive"
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
@@ -102,14 +108,14 @@ model Event {
   date    DateTime
   guestId String
   venueId String
-  status  Status   @default(OPEN)
+  status  EventStatus   @default(OPEN)
 
   //relation
   host User @relation(fields: [hostId], references: [id])
   venue Venue @relation(fields: [venueId], references: [id])
 }
 
-enum Status {
+enum EventStatus {
   OPEN
   CLOSED
   CANCELLED
