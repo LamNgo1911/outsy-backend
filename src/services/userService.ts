@@ -1,0 +1,91 @@
+import prisma from "../config/prisma";
+import { User, UserInput, UserUpdateInput } from "./types";
+
+// Get all users
+const getUsers = async (): Promise<User[]> => {
+  const users = await prisma.user.findMany();
+
+  return users;
+};
+
+// Get a user by ID
+const getUserById = async (id: string): Promise<User> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+
+  if (user) {
+    return user;
+  }
+
+  throw new Error("User not found");
+};
+
+// Create a new user
+const createUser = async ({
+  id,
+  username,
+  email,
+  password,
+  firstName,
+  lastName,
+  gender,
+  birthdate,
+  bio,
+  profilePicture,
+  location,
+  interests,
+  status,
+  onlineStatus,
+  preferences,
+  createdAt,
+  updatedAt,
+  igUrl,
+}: UserInput): Promise<User> => {
+  const newUser = await prisma.user.create({
+    data: {
+      id,
+      username,
+      email,
+      password,
+      firstName,
+      lastName,
+      gender,
+      birthdate,
+      bio,
+      profilePicture,
+      location,
+      interests,
+      status,
+      onlineStatus,
+      preferences,
+      createdAt,
+      updatedAt,
+      igUrl,
+    },
+  });
+
+  return newUser;
+};
+
+// Update a user by ID
+const updateUser = async (
+  id: string,
+  userUpdateInput: UserUpdateInput
+): Promise<void> => {
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: userUpdateInput,
+  });
+};
+
+// Delete a user by ID
+const deleteUser = async (id: string): Promise<void> => {
+  await prisma.user.delete({ where: { id } });
+};
+
+export default {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser,
+};

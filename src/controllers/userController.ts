@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-
-const prisma = new PrismaClient();
+import userService from "../services/userService";
+import { User } from "../services/types";
+import { Status } from "@prisma/client";
 
 // Get all users
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await userService.getUsers();
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving users" });
@@ -21,7 +21,7 @@ export const getUserById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({ where: { id } });
+    const user = await userService.getUserById(id);
     if (user) {
       res.json(user);
     } else {
@@ -56,26 +56,27 @@ export const createUser = async (
       igUrl,
     } = req.body;
 
-    const newUser = await prisma.user.create({
-      data: {
-        id: uuidv4(),
-        username,
-        email,
-        password,
-        firstName,
-        lastName,
-        gender,
-        birthdate,
-        bio,
-        profilePicture,
-        location,
-        interests,
-        status,
-        onlineStatus,
-        preferences,
-        igUrl,
-      },
+    const newUser: User = await userService.createUser({
+      id: uuidv4(),
+      username,
+      email,
+      password,
+      firstName,
+      lastName,
+      gender,
+      birthdate,
+      bio,
+      profilePicture,
+      location,
+      interests,
+      status: Status.ACTIVE,
+      onlineStatus,
+      preferences,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      igUrl,
     });
+
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ message: "Error creating user" });
@@ -106,27 +107,26 @@ export const updateUser = async (
       preferences,
       igUrl,
     } = req.body;
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: {
-        username,
-        email,
-        password,
-        firstName,
-        lastName,
-        gender,
-        birthdate,
-        bio,
-        profilePicture,
-        location,
-        interests,
-        status,
-        onlineStatus,
-        preferences,
-        igUrl,
-      },
+
+    await userService.updateUser(id, {
+      username,
+      email,
+      password,
+      firstName,
+      lastName,
+      gender,
+      birthdate,
+      bio,
+      profilePicture,
+      location,
+      interests,
+      status,
+      onlineStatus,
+      preferences,
+      igUrl,
     });
-    res.json(updatedUser);
+
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: "Error updating user" });
   }
@@ -139,7 +139,7 @@ export const deleteUser = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    await prisma.user.delete({ where: { id } });
+    await userService.deleteUser(id);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: "Error deleting user" });
