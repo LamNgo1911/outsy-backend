@@ -5,6 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import userRouter from "./routes/userRoutes";
+import eventRouter from "./routes/eventRoutes";
 // import dashboardRouter from './routes/dashboardRoutes';
 // import productRouter from './routes/productRoutes';
 // import expenseRouter from './routes/expenseRoutes';
@@ -25,6 +26,7 @@ app.get("/hello", (req, res) => {
 });
 
 app.use("/users", userRouter); // https://localhost:8000/users
+app.use("/events", eventRouter);
 // app.use('/dashboard', dashboardRouter); // https://localhost:8000/dashboard
 // app.use('/products', productRouter); // https://localhost:8000/products
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
