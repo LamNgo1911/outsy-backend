@@ -1,3 +1,6 @@
+import { Prisma, Status } from "@prisma/client"; // ✅ Import Status properly
+
+// User Type (For Reading Data)
 export interface User {
   id: string;
   username: string;
@@ -7,27 +10,73 @@ export interface User {
   lastName: string;
   gender: string;
   birthdate: Date;
-  bio?: string;
-  profilePicture?: string;
+  bio?: string | null;
+  profilePicture?: string | null;
   location: string;
   interests: string[];
-  status: "active" | "banned" | "inactive";
-  chats: Chat[];
+  status: Status;
 
   // Activity & Preferences
   onlineStatus: boolean;
-  preferences: Record<string, any>; // Define a stricter type if needed
+  preferences: Prisma.JsonValue; // ✅ Correct for reading
   createdAt: Date;
   updatedAt: Date;
-  igUrl?: string;
+  igUrl?: string | null;
 }
 
+// User Input Type (For Creating a User)
+export interface UserInput {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  birthdate: Date;
+  bio?: string | null;
+  profilePicture?: string | null;
+  location: string;
+  interests: string[];
+  status: Status;
+
+  // Activity & Preferences
+  onlineStatus?: boolean;
+  preferences: Prisma.InputJsonValue; // ✅ Correct for writing
+  createdAt: Date;
+  updatedAt: Date;
+  igUrl?: string | null;
+}
+
+// User Update Type (For Updating a User)
+export interface UserUpdateInput {
+  username?: string;
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  birthdate?: Date;
+  bio?: string | null;
+  profilePicture?: string | null;
+  location?: string;
+  interests?: string[];
+  status?: Status;
+
+  // Activity & Preferences
+  onlineStatus?: boolean;
+  preferences?: Prisma.InputJsonValue; // ✅ Correct for writing
+  igUrl?: string | null;
+}
+
+// Chat Interface
 export interface Chat {
   id: string;
   users: User[];
   messages: Message[];
 }
 
+// Message Interface
 export interface Message {
   id: number;
   chatId: string;
