@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client/extension";
+import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -33,19 +33,27 @@ export const getEventById = async (req: Request, res: Response) => {
 export const createEvent = async (req: Request, res: Response) => {
   try {
     const { hostId, eventName, eventDate, guestId, venueId, status } = req.body;
-    const newEvent = await prisma.event.create({
-      data: {
-        hostId,
-        name: eventName,
-        date: eventDate,
-        guestId,
-        venueId,
-        status,
-      },
+
+    const venueExists = await prisma.venue.findUnique({
+      where: { id: venueId },
     });
-    res.status(201).json(newEvent);
+
+    if (venueExists) {
+      const newEvent = await prisma.event.create({
+        data: {
+          hostId,
+          name: eventName,
+          date: new Date(eventDate),
+          guestId,
+          venueId,
+          status,
+        },
+      });
+      res.status(201).json(newEvent);
+    }
   } catch (error) {
     res.status(500).json({ error: error });
+    console.log(error);
   }
 };
 
@@ -66,17 +74,17 @@ export const updateEvent = async (req: Request, res: Response) => {
 };
 
 export const changeEventStatus = async (req: Request, res: Response) => {
-    try {
-      const { eventId } = req.params;
-      const { status } = req.body;
-      const updatedEvent = await prisma.event.update({
-        where: {
-          id: eventId,
-        },
-        data: { status },
-      });
-      res.status(200).json(updatedEvent);
-    } catch (error) {
-      res.status(500).json({ error: error });
-    }
-  };
+  try {
+    const { eventId } = req.params;
+    const { status } = req.body;
+    const updatedEvent = await prisma.event.update({
+      where: {
+        id: eventId,
+      },
+      data: { status },
+    });
+    res.status(200).json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+};
