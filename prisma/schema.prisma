@@ -53,7 +53,7 @@ model UserChat {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  @@id([userId, chatId]) // Composite primary key 
+  @@id([userId, chatId]) // Composite primary key. In SQL, this is PRIMARY KEY (userId, chatId), 
 }
 
 model Message {
