@@ -1,25 +1,25 @@
-import { PrismaClient } from "@prisma/client";
+import { EventStatus } from "@prisma/client";
 import { Request, Response } from "express";
+import { EventUpdateInput } from "../services/types";
+import eventService from "../services/eventService";
+import venueService from "../services/venueService";
 
-const prisma = new PrismaClient();
-
-export const getEvents = async (req: Request, res: Response) => {
+export const getEvents = async (req: Request, res: Response): Promise<void> => {
   try {
-    const events = await prisma.event.findMany();
+    const events = await eventService.getEvents();
     res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ error: error });
   }
 };
 
-export const getEventById = async (req: Request, res: Response) => {
+export const getEventById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { eventId } = req.params;
   try {
-    const event = await prisma.event.findUnique({
-      where: {
-        id: eventId,
-      },
-    });
+    const event = await eventService.getEventById(eventId);
     if (event) {
       res.status(200).json(event);
     } else {
@@ -30,26 +30,29 @@ export const getEventById = async (req: Request, res: Response) => {
   }
 };
 
-export const createEvent = async (req: Request, res: Response) => {
+export const createEvent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const { hostId, eventName, eventDate, guestId, venueId, status } = req.body;
+    const { hostId, eventName, eventDate, guestId, venueId } = req.body;
 
-    const venueExists = await prisma.venue.findUnique({
-      where: { id: venueId },
-    });
+    const venueExists = await venueService.getVenueById(venueId);
 
     if (venueExists) {
-      const newEvent = await prisma.event.create({
-        data: {
-          hostId,
-          name: eventName,
-          date: new Date(eventDate),
-          guestId,
-          venueId,
-          status,
-        },
+      const newEvent = await eventService.createEvent({
+        hostId,
+        eventName,
+        eventDate,
+        guestId,
+        venueId,
+        status: EventStatus.OPEN,
       });
       res.status(201).json(newEvent);
+    } else {
+      res.status(404).json({
+        error: `Can't find venue with id ${venueId}`,
+      });
     }
   } catch (error) {
     res.status(500).json({ error: error });
@@ -57,33 +60,37 @@ export const createEvent = async (req: Request, res: Response) => {
   }
 };
 
-export const updateEvent = async (req: Request, res: Response) => {
+export const updateEvent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { eventId } = req.params;
-    const { hostId, eventName, eventDate, guestId, venueId } = req.body;
-    const updatedEvent = await prisma.event.update({
-      where: {
-        id: eventId,
-      },
-      data: { hostId, name: eventName, date: eventDate, guestId, venueId },
-    });
-    res.status(200).json(updatedEvent);
+    const requestedData: EventUpdateInput = req.body;
+
+    const venueExists = await venueService.getVenueById(requestedData.venueId);
+
+    if (venueExists) {
+      const updatedEvent = await eventService.updateEvent(
+        eventId,
+        requestedData
+      );
+      res.status(200).json(updatedEvent);
+    }
   } catch (error) {
     res.status(500).json({ error: error });
   }
 };
 
-export const changeEventStatus = async (req: Request, res: Response) => {
+export const deleteEvent = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { eventId } = req.params;
-    const { status } = req.body;
-    const updatedEvent = await prisma.event.update({
-      where: {
-        id: eventId,
-      },
-      data: { status },
-    });
-    res.status(200).json(updatedEvent);
+
+    await eventService.deleteEvent(eventId);
+    res.status(200).json({ message: `Delete event ${eventId} successfully.` });
   } catch (error) {
     res.status(500).json({ error: error });
   }

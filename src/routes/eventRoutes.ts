@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
-  changeEventStatus,
   createEvent,
+  deleteEvent,
   getEventById,
   getEvents,
   updateEvent,
@@ -9,10 +9,10 @@ import {
 
 const router = Router();
 
-router.get("/all", getEvents);
-router.get("/:id", getEventById);
+router.get("/", getEvents);
+router.get("/:eventId", getEventById);
 router.post("/", createEvent);
-router.put("/:id", updateEvent);
-router.put("/change-status", changeEventStatus);
+router.put("/:eventId", updateEvent);
+router.delete("/:eventId", deleteEvent);
 
 export default router;
