@@ -106,9 +106,9 @@ model Event {
   hostId  String
   name    String
   date    DateTime
-  guestId String
+  guestId String?
   venueId String
-  status  EventStatus   @default(OPEN)
+  status  EventStatus
 
   //relation
   host User @relation(fields: [hostId], references: [id])

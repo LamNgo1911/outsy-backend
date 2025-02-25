@@ -1,4 +1,4 @@
-import { Prisma, Status } from "@prisma/client"; // ✅ Import Status properly
+import { EventStatus, Prisma, Status } from "@prisma/client"; // ✅ Import Status properly
 
 // User Type (For Reading Data)
 export interface User {
@@ -87,6 +87,40 @@ export interface Message {
   chat: Chat;
 }
 
+// Event Interfaces
+export interface Event {
+  id: string;
+  hostId: string;
+  name: string;
+  date: Date;
+  guestId: string | null;
+  venueId: string;
+  status: EventStatus;
+}
+
+export interface EventCreationInput {
+  hostId: string;
+  eventName: string;
+  eventDate: Date;
+  guestId: string;
+  venueId: string;
+  status: EventStatus
+}
+
+export type Venue = {
+  id: string;
+  name: string;
+  address: string;
+};
+
+export interface EventUpdateInput {
+  hostId: string;
+  name: string;
+  date: Date;
+  guestId?: string;
+  venueId: string;
+  status: EventStatus;
+}
 // Uncomment and define these interfaces if needed
 
 // interface Match {
