@@ -1,0 +1,37 @@
+[
+  {
+    "id": "feedback_1",
+    "userId": "user_12345",
+    "giverId": "user_67890",
+    "text": "Friendly and humorous!",
+    "createdAt": "2025-02-05T10:00:00.000Z"
+  },
+  {
+    "id": "feedback_2",
+    "userId": "user_67890",
+    "giverId": "user_11223",
+    "text": "Great conversation starter!",
+    "createdAt": "2025-02-05T11:00:00.000Z"
+  },
+  {
+    "id": "feedback_3",
+    "userId": "user_11223",
+    "giverId": "user_12345",
+    "text": "Punctual and reliable!",
+    "createdAt": "2025-02-05T12:00:00.000Z"
+  },
+  {
+    "id": "feedback_4",
+    "userId": "user_12345",
+    "giverId": "user_11223",
+    "text": "Always a pleasure to talk with you!",
+    "createdAt": "2025-02-05T13:00:00.000Z"
+  },
+  {
+    "id": "feedback_5",
+    "userId": "user_67890",
+    "giverId": "user_12345",
+    "text": "Always a pleasure to hang out with you!",
+    "createdAt": "2025-02-05T14:00:00.000Z"
+  }
+]

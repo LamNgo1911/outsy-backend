@@ -5,8 +5,9 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import userRouter from "./routes/userRoutes";
-// import dashboardRouter from './routes/dashboardRoutes';
-// import productRouter from './routes/productRoutes';
+import chatRouter from './routes/chatRoutes';
+import messageRouter from './routes/messageRoutes';
+import feedbackRouter from './routes/feedbackRoutes';
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -25,8 +26,9 @@ app.get("/hello", (req, res) => {
 });
 
 app.use("/users", userRouter); // https://localhost:8000/users
-// app.use('/dashboard', dashboardRouter); // https://localhost:8000/dashboard
-// app.use('/products', productRouter); // https://localhost:8000/products
+app.use('/chats', chatRouter); 
+app.use('/messages', messageRouter); 
+app.use('/feedback', feedbackRouter); 
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;

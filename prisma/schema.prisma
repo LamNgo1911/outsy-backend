@@ -36,8 +36,15 @@ model User {
   igUrl        String? // Instagram URL
   // Photo        Photo[]
 
-  // Relationships
-  chats UserChat[]
+  /**
+   * Virtual columns (relations) do not exist as a physical column in the database table
+   * but behaves like one for querying and data access purposes.
+   * It allows you to access related data from another table
+   * without explicitly storing it in the current table.
+   */
+  chats             UserChat[]
+  feedbacksReceived Feedback[] @relation("FeedbackRecipient") // Back relation for `user` in Feedback
+  feedbacksGiven    Feedback[] @relation("FeedbackGiver") // Back relation for `giver` in Feedback
   // matches       Match[] // Matches with other users
   // likes         Like[] // Likes sent to other users
   // receivedLikes Like[] // Likes received from other users
@@ -59,7 +66,7 @@ model UserChat {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  @@id([userId, chatId]) // Composite primary key 
+  @@id([userId, chatId]) // Composite primary key. In SQL, this is PRIMARY KEY (userId, chatId), 
 }
 
 model Message {
@@ -71,6 +78,17 @@ model Message {
   isRead   Boolean  @default(false)
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  giverId   String
+  text      String
+  createdAt DateTime @default(now())
+
+  user  User @relation("FeedbackRecipient", fields: [userId], references: [id]) // Forward relation
+  giver User @relation("FeedbackGiver", fields: [giverId], references: [id]) // Forward relation
 }
 
 // model Matches {
