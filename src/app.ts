@@ -7,6 +7,7 @@ import morgan from "morgan";
 import userRouter from "./routes/userRoutes";
 import chatRouter from './routes/chatRoutes';
 import messageRouter from './routes/messageRoutes';
+import feedbackRouter from './routes/feedbackRoutes';
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -27,6 +28,7 @@ app.get("/hello", (req, res) => {
 app.use("/users", userRouter); // https://localhost:8000/users
 app.use('/chats', chatRouter); 
 app.use('/messages', messageRouter); 
+app.use('/feedback', feedbackRouter); 
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;
