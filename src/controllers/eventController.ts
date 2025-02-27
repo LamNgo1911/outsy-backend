@@ -75,7 +75,7 @@ export const updateEvent = async (
         eventId,
         requestedData
       );
-      res.status(200).json(updatedEvent);
+      res.status(204).json(updatedEvent);
     }
   } catch (error) {
     res.status(500).json({ error: error });
