@@ -1,0 +1,14 @@
+[
+  {
+    "userId": "user_12345",
+    "chatId": "chat_1001"
+  },
+  {
+    "userId": "user_67890",
+    "chatId": "chat_1001"
+  },
+  {
+    "userId": "user_12345",
+    "chatId": "chat_1002"
+  }
+]
