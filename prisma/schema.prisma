@@ -45,6 +45,7 @@ model User {
   chats             UserChat[]
   feedbacksReceived Feedback[] @relation("FeedbackRecipient") // Back relation for `user` in Feedback
   feedbacksGiven    Feedback[] @relation("FeedbackGiver") // Back relation for `giver` in Feedback
+  hostedEvents      Event[]    @relation("EventHost")
   // matches       Match[] // Matches with other users
   // likes         Like[] // Likes sent to other users
   // receivedLikes Like[] // Likes received from other users
@@ -117,3 +118,32 @@ model Feedback {
 //   uploadedAt DateTime @default(now())
 //   user       User     @relation(fields: [userId], references: [id])
 // }
+
+model Event {
+  id      String   @id @default(cuid())
+  hostId  String
+  name    String
+  date    DateTime
+  guestId String?
+  venueId String
+  status  EventStatus
+
+  //relation
+  host User @relation("EventHost", fields: [hostId], references: [id])
+  venue Venue @relation("EventVenue", fields: [venueId], references: [id])
+}
+
+enum EventStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+model Venue {
+  id      String @id @default(cuid())
+  name    String
+  address String
+
+  //relation
+  events Event[]  @relation("EventVenue")
+}
