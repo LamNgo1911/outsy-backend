@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { User, UserInput, UserUpdateInput } from "./types";
+import { User, UserInput, UserUpdateInput } from "../types/types";
 
 // Get all users
 const getUsers = async (): Promise<User[]> => {
