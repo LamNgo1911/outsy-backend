@@ -1,6 +1,6 @@
 import { EventStatus } from "@prisma/client";
 import { Request, Response } from "express";
-import { EventUpdateInput } from "../services/types";
+import { EventUpdateInput } from "../types/types";
 import eventService from "../services/eventService";
 import venueService from "../services/venueService";
 

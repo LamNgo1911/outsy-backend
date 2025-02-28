@@ -6,9 +6,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import userRouter from "./routes/userRoutes";
 import eventRouter from "./routes/eventRoutes";
-import chatRouter from './routes/chatRoutes';
-import messageRouter from './routes/messageRoutes';
-import feedbackRouter from './routes/feedbackRoutes';
+import chatRouter from "./routes/chatRoutes";
+import messageRouter from "./routes/messageRoutes";
+import feedbackRouter from "./routes/feedbackRoutes";
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -26,11 +26,11 @@ app.get("/hello", (req, res) => {
   res.send("Hello from server");
 });
 
-app.use("/users", userRouter); // https://localhost:8000/users
-app.use("/events", eventRouter);
-app.use('/chats', chatRouter); 
-app.use('/messages', messageRouter); 
-app.use('/feedback', feedbackRouter); 
+app.use("/api/v1/users", userRouter); // https://localhost:8000/users
+app.use("/api/v1/events", eventRouter);
+app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/feedback", feedbackRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;

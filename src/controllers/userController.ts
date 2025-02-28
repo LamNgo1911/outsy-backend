@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import userService from "../services/userService";
-import { User } from "../services/types";
+import { User } from "../types/types";
 import { Status } from "@prisma/client";
 
 // Get all users
