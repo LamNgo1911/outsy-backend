@@ -13,6 +13,7 @@ enum Status {
   INACTIVE
 }
 
+// User model to store user information
 model User {
   id             String   @id @default(cuid())
   username       String   @unique
@@ -34,7 +35,6 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   igUrl        String? // Instagram URL
-  // Photo        Photo[]
 
   /**
    * Virtual columns (relations) do not exist as a physical column in the database table
@@ -43,21 +43,23 @@ model User {
    * without explicitly storing it in the current table.
    */
   chats             UserChat[]
-  feedbacksReceived Feedback[] @relation("FeedbackRecipient") // Back relation for `user` in Feedback
-  feedbacksGiven    Feedback[] @relation("FeedbackGiver") // Back relation for `giver` in Feedback
-  hostedEvents      Event[]    @relation("EventHost")
-  // matches       Match[] // Matches with other users
-  // likes         Like[] // Likes sent to other users
-  // receivedLikes Like[] // Likes received from other users
+  feedbacksReceived Feedback[]  @relation("FeedbackRecipient")
+  feedbacksGiven    Feedback[]  @relation("FeedbackGiver")
+  hostedEvents      Event[]     @relation("EventHost")
+  eventLikes        EventLike[]
+  hostMatches       Match[]     @relation("MatchHost")
+  guestMatches      Match[]     @relation("MatchGuest")
 }
 
+// Chat model to store the chat rooms between users
 model Chat {
-  id       String  @id @default(cuid())
-  isActive Boolean @default(true)
-  // createdAt DateTime   @default(now())
+  id        String   @id @default(cuid())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 
   users    UserChat[]
   messages Message[]
+  matches  Match[]    @relation("MatchChat")
 }
 
 model UserChat {
@@ -67,7 +69,7 @@ model UserChat {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  @@id([userId, chatId]) // Composite primary key. In SQL, this is PRIMARY KEY (userId, chatId), 
+  @@id([userId, chatId])
 }
 
 model Message {
@@ -81,6 +83,7 @@ model Message {
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 }
 
+// Feedback model to store the feedback given by users
 model Feedback {
   id        String   @id @default(cuid())
   userId    String
@@ -88,65 +91,108 @@ model Feedback {
   text      String
   createdAt DateTime @default(now())
 
-  user  User @relation("FeedbackRecipient", fields: [userId], references: [id]) // Forward relation
-  giver User @relation("FeedbackGiver", fields: [giverId], references: [id]) // Forward relation
+  user  User @relation("FeedbackRecipient", fields: [userId], references: [id])
+  giver User @relation("FeedbackGiver", fields: [giverId], references: [id])
 }
 
-// model Matches {
-//   id         Int       @id @default(autoincrement())
-//   user1Id    Int
-//   user2Id    Int
-//   matchedAt  DateTime  @default(now())
-//   isActive   Boolean   @default(true) // Whether the match is still active
-//   user1      User      @relation(fields: [user1Id], references: [id])
-//   user2      User      @relation(fields: [user2Id], references: [id])
-// }
-
-// model Likes {
-//   id         Int      @id @default(autoincrement())
-//   senderId   Int
-//   receiverId Int
-//   sentAt     DateTime @default(now())
-//   sender     User     @relation(fields: [senderId], references: [id])
-//   receiver   User     @relation(fields: [receiverId], references: [id])
-// }
-
-// model Photos {
-//   id         Int      @id @default(autoincrement())
-//   userId     Int
-//   url        String
-//   uploadedAt DateTime @default(now())
-//   user       User     @relation(fields: [userId], references: [id])
-// }
-
+// Event model to store the events created by users
 model Event {
-  id      String      @id @default(cuid())
-  hostId  String
-  name    String
-  date    DateTime
-  guestId String?
-  venueId String
-  status  EventStatus
+  id          String      @id @default(cuid())
+  hostId      String
+  name        String
+  description String?
+  type        EventType   @default(FOOD)
+  date        DateTime
+  venueId     String
+  status      EventStatus @default(OPEN)
+  capacity    Int         @default(2)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   //relation
-  host  User  @relation("EventHost", fields: [hostId], references: [id])
-  venue Venue @relation("EventVenue", fields: [venueId], references: [id])
+  host      User        @relation("EventHost", fields: [hostId], references: [id])
+  venue     Venue       @relation("EventVenue", fields: [venueId], references: [id])
+  EventLike EventLike[]
+  Match     Match[]
+}
+
+enum EventType {
+  FOOD
+  DRINKS
+  ACTIVITY
+  OTHER
 }
 
 enum EventStatus {
-  OPEN
-  CLOSED
-  CANCELLED
+  OPEN // Event is open for registration
+  CLOSED // Event registration is closed
+  CANCELLED // Event is cancelled
 }
 
+// EventLike model to store the likes from users to events
+model EventLike {
+  id        String     @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime   @default(now())
+  status    LikeStatus @default(PENDING)
+  message   String? // Optional message from user showing interest
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId]) // A user can only like an event once
+}
+
+enum LikeStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// Match model to store the matches between users and events
+model Match {
+  id        String      @id @default(cuid())
+  eventId   String
+  hostId    String
+  guestId   String
+  chatId    String?
+  status    MatchStatus @default(CONFIRMED)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  host  User  @relation("MatchHost", fields: [hostId], references: [id])
+  guest User  @relation("MatchGuest", fields: [guestId], references: [id])
+  chat  Chat? @relation("MatchChat", fields: [chatId], references: [id])
+
+  @@unique([eventId, guestId]) // Ensures a user can only match once with an event
+}
+
+enum MatchStatus {
+  CONFIRMED // when host accepts guest's request
+  COMPLETED // when the event is over
+  CANCELLED // when either party cancels the match
+}
+
+//ANCHOR - there are two cases where it comes CANCELLED status:
+// 1. Host cancels event: Event status changes to CANCELLED - send notification to the guest
+// 2. Guest cancels match -> Send notification to the host to decide if they want to cancel the event or find a new guest
+// Note: They can only cancel the match before 3 hours of the event start time
+
+// Venue model to store the venue information from Google Places API
 model Venue {
-  id         String  @id @default(cuid())
-  name       String
-  address    String
-  postalCode String
-  city       String
-  country    String
-  phone      String?
+  id          String  @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String?
+  country     String
+  postalCode  String?
+  description String?
+  imageUrl    String?
 
   //relation
   events Event[] @relation("EventVenue")
