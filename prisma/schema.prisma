@@ -120,7 +120,7 @@ model Feedback {
 // }
 
 model Event {
-  id      String   @id @default(cuid())
+  id      String      @id @default(cuid())
   hostId  String
   name    String
   date    DateTime
@@ -129,7 +129,7 @@ model Event {
   status  EventStatus
 
   //relation
-  host User @relation("EventHost", fields: [hostId], references: [id])
+  host  User  @relation("EventHost", fields: [hostId], references: [id])
   venue Venue @relation("EventVenue", fields: [venueId], references: [id])
 }
 
@@ -140,10 +140,14 @@ enum EventStatus {
 }
 
 model Venue {
-  id      String @id @default(cuid())
-  name    String
-  address String
+  id         String  @id @default(cuid())
+  name       String
+  address    String
+  postalCode String
+  city       String
+  country    String
+  phone      String?
 
   //relation
-  events Event[]  @relation("EventVenue")
+  events Event[] @relation("EventVenue")
 }
