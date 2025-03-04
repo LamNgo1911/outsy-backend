@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { Event, EventCreationInput, EventUpdateInput } from "../types/types";
+import { Event, EventInput } from "../types/types";
 
 const getEvents = async (): Promise<Event[]> => {
   const events = await prisma.event.findMany();
@@ -18,20 +18,21 @@ const getEventById = async (eventId: string): Promise<Event> => {
 
 const createEvent = async ({
   hostId,
-  eventName,
-  eventDate,
-  guestId,
+  name,
+  date,
   venueId,
-  status
-}: EventCreationInput): Promise<Event> => {
+  status,
+}: EventInput): Promise<Event> => {
   const newEvent = await prisma.event.create({
     data: {
       hostId,
-      name: eventName,
-      date: new Date(eventDate),
-      guestId,
+      name,
+      date: new Date(date),
       venueId,
       status,
+      capacity: 2,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   });
 
@@ -40,11 +41,11 @@ const createEvent = async ({
 
 const updateEvent = async (
   id: string,
-  eventUpdateInput: EventUpdateInput
+  eventUpdateInput: EventInput
 ): Promise<Event> => {
   const newUpdatedEvent = await prisma.event.update({
     where: { id },
-    data: eventUpdateInput,
+    data: { ...eventUpdateInput, updatedAt: new Date() },
   });
   return newUpdatedEvent;
 };
