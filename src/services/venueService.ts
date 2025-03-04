@@ -20,7 +20,8 @@ const createVenue = async ({
   postalCode,
   city,
   country,
-  phone,
+  description,
+  imageUrl
 }: VenueInput): Promise<Venue> => {
   const newVenue = await prisma.venue.create({
     data: {
@@ -29,7 +30,8 @@ const createVenue = async ({
       postalCode,
       city,
       country,
-      phone,
+      description,
+      imageUrl
     },
   });
 

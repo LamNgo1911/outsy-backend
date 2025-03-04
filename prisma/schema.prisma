@@ -190,7 +190,7 @@ model Venue {
   city        String
   state       String?
   country     String
-  postalCode  String?
+  postalCode  String
   description String?
   imageUrl    String?
 

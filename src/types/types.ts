@@ -1,4 +1,4 @@
-import { EventStatus, Prisma, Status } from "@prisma/client"; // ✅ Import Status properly
+import { EventStatus, EventType, LikeStatus, Prisma, Status } from "@prisma/client"; // ✅ Import Status properly
 
 // User Type (For Reading Data)
 export interface User {
@@ -92,47 +92,61 @@ export interface Event {
   id: string;
   hostId: string;
   name: string;
+  description: string | null;
+  type: EventType;
   date: Date;
-  guestId: string | null;
   venueId: string;
   status: EventStatus;
+  capacity: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface EventCreationInput {
-  hostId: string;
-  eventName: string;
-  eventDate: Date;
-  guestId: string;
-  venueId: string;
-  status: EventStatus;
-}
-
-export interface EventUpdateInput {
+export interface EventInput {
   hostId: string;
   name: string;
+  description?: string;
+  type: EventType;
   date: Date;
-  guestId?: string;
   venueId: string;
   status: EventStatus;
+}
+
+export interface EventLike {
+  userId: string;
+  eventId: string;
+  createdAt: Date;
+  status: LikeStatus;
+  message: string | null;
+}
+
+export interface EventLikeInput {
+  userId: string;
+  eventId: string;
+  message: string;
 }
 
 export type Venue = {
   id: string;
   name: string;
   address: string;
+  state: string | null;
   postalCode: string;
   city: string;
   country: string;
-  phone: string | null;
+  description: string | null;
+  imageUrl: string | null;
 };
 
 export type VenueInput = {
   venueName: string;
   address: string;
+  state?: string;
   postalCode: string;
   city: string;
   country: string;
-  phone?: string;
+  description?: string;
+  imageUrl?: string
 };
 // Uncomment and define these interfaces if needed
 
