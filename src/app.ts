@@ -9,6 +9,7 @@ import eventRouter from "./routes/eventRoutes";
 import chatRouter from './routes/chatRoutes';
 import messageRouter from './routes/messageRoutes';
 import feedbackRouter from './routes/feedbackRoutes';
+import userchatRouter from './routes/userChatRoutes';
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -31,6 +32,7 @@ app.use("/events", eventRouter);
 app.use('/chats', chatRouter); 
 app.use('/messages', messageRouter); 
 app.use('/feedback', feedbackRouter); 
+app.use('/userchat', userchatRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;
