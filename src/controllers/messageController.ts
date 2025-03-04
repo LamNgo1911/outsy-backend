@@ -1,19 +1,10 @@
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-
-const prisma = new PrismaClient();
+import messageService from '../services/messageService';
 
 export const sendMessage = async (req: Request, res: Response) => {
   const { chatId, senderId, content } = req.body;
   try {
-    const message = await prisma.message.create({
-      data: {
-        chatId,
-        senderId,
-        content,
-      },
-      include: { chat: true },
-    });
+    const message = await messageService.sendMessage(chatId, senderId, content);
     res.status(201).json(message);
   } catch (error) {
     res.status(500).json({ error: 'Failed to send message' });
@@ -23,10 +14,7 @@ export const sendMessage = async (req: Request, res: Response) => {
 export const getMessagesByChat = async (req: Request, res: Response) => {
   const { chatId } = req.params;
   try {
-    const messages = await prisma.message.findMany({
-      where: { chatId },
-      orderBy: { sentAt: 'asc' },
-    });
+    const messages = await messageService.getMessagesByChat(chatId);
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve messages' });
