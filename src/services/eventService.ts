@@ -22,7 +22,7 @@ const createEvent = async ({
   eventDate,
   guestId,
   venueId,
-  status,
+  status
 }: EventCreationInput): Promise<Event> => {
   const newEvent = await prisma.event.create({
     data: {

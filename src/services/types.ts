@@ -104,14 +104,8 @@ export interface EventCreationInput {
   eventDate: Date;
   guestId: string;
   venueId: string;
-  status: EventStatus
+  status: EventStatus;
 }
-
-export type Venue = {
-  id: string;
-  name: string;
-  address: string;
-};
 
 export interface EventUpdateInput {
   hostId: string;
@@ -121,6 +115,25 @@ export interface EventUpdateInput {
   venueId: string;
   status: EventStatus;
 }
+
+export type Venue = {
+  id: string;
+  name: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  phone: string | null;
+};
+
+export type VenueInput = {
+  venueName: string;
+  address: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  phone?: string;
+};
 // Uncomment and define these interfaces if needed
 
 // interface Match {
