@@ -27,12 +27,12 @@ app.get("/hello", (req, res) => {
   res.send("Hello from server");
 });
 
-app.use("/users", userRouter); // https://localhost:8000/users
-app.use("/events", eventRouter);
-app.use('/chats', chatRouter); 
-app.use('/messages', messageRouter); 
-app.use('/feedback', feedbackRouter); 
-app.use('/userchat', userchatRouter);
+app.use("/api/v1/users", userRouter); // https://localhost:8000/users
+app.use("/api/v1/events", eventRouter);
+app.use("/api/v1/chats", chatRouter);
+app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/feedback", feedbackRouter);
+app.use('/api/v1/userchat', userchatRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;

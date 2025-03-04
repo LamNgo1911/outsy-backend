@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import userService from "../services/userService";
-import { User } from "../services/types";
+import { User } from "../types/types";
 import { Status } from "@prisma/client";
 
 // Get all users
@@ -51,6 +51,7 @@ export const createUser = async (
       location,
       interests,
       status,
+      chats,
       onlineStatus,
       preferences,
       igUrl,
@@ -79,6 +80,7 @@ export const createUser = async (
 
     res.status(201).json(newUser);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating user" });
   }
 };
