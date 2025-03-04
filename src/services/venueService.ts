@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { Venue, VenueInput } from "./types";
+import { Venue, VenueInput } from "../types/types";
 
 const getAllVenue = async (): Promise<Venue[]> => {
   const venues = await prisma.venue.findMany();

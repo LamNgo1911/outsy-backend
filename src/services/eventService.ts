@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { Event, EventCreationInput, EventUpdateInput } from "./types";
+import { Event, EventCreationInput, EventUpdateInput } from "../types/types";
 
 const getEvents = async (): Promise<Event[]> => {
   const events = await prisma.event.findMany();
