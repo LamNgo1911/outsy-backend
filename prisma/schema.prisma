@@ -124,9 +124,9 @@ enum EventType {
 }
 
 enum EventStatus {
-  OPEN
-  CLOSED
-  CANCELLED
+  OPEN // Event is open for registration
+  CLOSED // Event registration is closed
+  CANCELLED // Event is cancelled
 }
 
 // EventLike model to store the likes from users to events
@@ -177,7 +177,12 @@ enum MatchStatus {
   CANCELLED // when either party cancels the match
 }
 
-// Venue model to store the venue information
+//ANCHOR - there are two cases where it comes CANCELLED status:
+// 1. Host cancels event: Event status changes to CANCELLED - send notification to the guest
+// 2. Guest cancels match -> Send notification to the host to decide if they want to cancel the event or find a new guest
+// Note: They can only cancel the match before 3 hours of the event start time
+
+// Venue model to store the venue information from Google Places API
 model Venue {
   id          String  @id @default(cuid())
   name        String
