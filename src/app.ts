@@ -6,9 +6,10 @@ import helmet from "helmet";
 import morgan from "morgan";
 import userRouter from "./routes/userRoutes";
 import eventRouter from "./routes/eventRoutes";
-import chatRouter from "./routes/chatRoutes";
-import messageRouter from "./routes/messageRoutes";
-import feedbackRouter from "./routes/feedbackRoutes";
+import chatRouter from './routes/chatRoutes';
+import messageRouter from './routes/messageRoutes';
+import feedbackRouter from './routes/feedbackRoutes';
+import userchatRouter from './routes/userChatRoutes';
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -31,6 +32,7 @@ app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/feedback", feedbackRouter);
+app.use('/api/v1/userchat', userchatRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
 
 export default app;
