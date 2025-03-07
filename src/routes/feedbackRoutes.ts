@@ -9,15 +9,15 @@ import {
 const router = express.Router();
 
 // Create feedback
-router.post('/feedback', createFeedback);
+router.post('/', createFeedback);
 
 // Get feedback received by a user
-router.get('/users/:userId/feedback/received', getFeedbackReceived);
+router.get('/:userId/feedback/received', getFeedbackReceived);
 
 // Get feedback given by a user
-router.get('/users/:giverId/feedback/given', getFeedbackGiven);
+router.get('/:userId/feedback/given', getFeedbackGiven);
 
 // Delete feedback
-router.delete('/feedback/:id', deleteFeedback);
+router.delete('/:feedbackId', deleteFeedback);
 
 export default router;
