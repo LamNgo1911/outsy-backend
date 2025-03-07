@@ -10,10 +10,10 @@ const router = Router();
 
 router.post('/', createChat);
 
-router.delete('/:chatId', deleteChat);
+router.delete('/:id', deleteChat);
 
 router.get('/', getAllChats);
 
-router.get('/:chatId', getChatById);
+router.get('/:id', getChatById);
 
 export default router;
