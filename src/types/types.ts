@@ -72,8 +72,8 @@ export interface UserUpdateInput {
 // Chat Interface
 export interface Chat {
   id: string;
-  users: User[];
-  messages: Message[];
+  isActive: boolean;
+  createdAt: Date;
 }
 
 // Message Interface

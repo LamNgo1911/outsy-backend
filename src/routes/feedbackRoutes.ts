@@ -12,12 +12,12 @@ const router = express.Router();
 router.post('/', createFeedback);
 
 // Get feedback received by a user
-router.get('/:userId/feedback/received', getFeedbackReceived);
+router.get('received/:userId', getFeedbackReceived);
 
 // Get feedback given by a user
-router.get('/:userId/feedback/given', getFeedbackGiven);
+router.get('given/:userId', getFeedbackGiven);
 
 // Delete feedback
-router.delete('/:feedbackId', deleteFeedback);
+router.delete('/:id', deleteFeedback);
 
 export default router;
