@@ -1,6 +1,6 @@
 import { EventStatus } from "@prisma/client";
 import { Request, Response } from "express";
-import { EventUpdateInput } from "../types/types";
+import { EventInput } from "../types/types";
 import eventService from "../services/eventService";
 import venueService from "../services/venueService";
 
@@ -35,23 +35,21 @@ export const createEvent = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { hostId, eventName, eventDate, guestId, venueId } = req.body;
+    const newEventRequestBody: EventInput = req.body;
 
-    const venueExists = await venueService.getVenueById(venueId);
+    const venueExists = await venueService.getVenueById(
+      newEventRequestBody.venueId
+    );
 
     if (venueExists) {
       const newEvent = await eventService.createEvent({
-        hostId,
-        eventName,
-        eventDate,
-        guestId,
-        venueId,
+        ...newEventRequestBody,
         status: EventStatus.OPEN,
       });
       res.status(201).json(newEvent);
     } else {
       res.status(404).json({
-        error: `Can't find venue with id ${venueId}`,
+        error: `Can't find venue with id ${newEventRequestBody.venueId}`,
       });
     }
   } catch (error) {
@@ -66,7 +64,7 @@ export const updateEvent = async (
 ): Promise<void> => {
   try {
     const { eventId } = req.params;
-    const requestedData: EventUpdateInput = req.body;
+    const requestedData: EventInput = req.body;
 
     const venueExists = await venueService.getVenueById(requestedData.venueId);
 
