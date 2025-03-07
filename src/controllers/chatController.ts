@@ -4,7 +4,7 @@ import chatService from '../services/chatService';
 // Create a new chat
 export const createChat = async (req: Request, res: Response) => {
   try {
-    const chat = await chatService.createChat(true);
+    const chat = await chatService.createChat();
     res.status(201).json(chat);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create chat' });

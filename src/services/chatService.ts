@@ -2,12 +2,8 @@ import prisma from '../config/prisma';
 import { Chat } from '@prisma/client';
 
 // Create a new chat
-const createChat = async (isActive: boolean): Promise<Chat> => {
-  const chat = await prisma.chat.create({
-    data: {
-      isActive,
-    },
-  });
+const createChat = async (): Promise<Chat> => {
+  const chat = await prisma.chat.create({ data: {} });
   if (chat) {
     return chat;
   }
