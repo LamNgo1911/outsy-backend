@@ -2,20 +2,11 @@ import prisma from '../config/prisma';
 import { Chat } from '@prisma/client';
 
 // Create a new chat
-const createChat = async (userIds: string[]): Promise<Chat> => {
+const createChat = async (isActive: boolean): Promise<Chat> => {
   const chat = await prisma.chat.create({
     data: {
-      users: {
-        create: userIds.map((userId: string) => ({
-          /* NOTE: 
-              For each user ID, this object tells Prisma to create a new record in the UserChat join table 
-              & connect this relationship to an existing user whose id matches the given userId
-              */
-          user: { connect: { id: userId } },
-        })),
-      },
+      isActive,
     },
-    include: { users: true, messages: true },
   });
   if (chat) {
     return chat;
