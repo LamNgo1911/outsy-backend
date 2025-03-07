@@ -1,7 +1,7 @@
 import prisma from "../config/prisma";
 import { Venue, VenueInput } from "../types/types";
 
-const getAllVenue = async (): Promise<Venue[]> => {
+const getAllVenues = async (): Promise<Venue[]> => {
   const venues = await prisma.venue.findMany();
   return venues;
 };
@@ -15,7 +15,7 @@ const getVenueById = async (venueId: string): Promise<Venue> => {
 };
 
 const createVenue = async ({
-  venueName,
+  name,
   address,
   postalCode,
   city,
@@ -25,7 +25,7 @@ const createVenue = async ({
 }: VenueInput): Promise<Venue> => {
   const newVenue = await prisma.venue.create({
     data: {
-      name: venueName,
+      name,
       address,
       postalCode,
       city,
@@ -50,14 +50,14 @@ const updateVenue = async (
   return newUpdatedVenue;
 };
 
-const deleteEvent = async (id: string): Promise<void> => {
+const deleteVenue = async (id: string): Promise<void> => {
   await prisma.venue.delete({ where: { id } });
 };
 
 export default {
   getVenueById,
-  getAllVenue,
+  getAllVenues,
   createVenue,
   updateVenue,
-  deleteEvent,
+  deleteVenue,
 };

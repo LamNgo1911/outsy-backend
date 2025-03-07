@@ -139,7 +139,7 @@ export type Venue = {
 };
 
 export type VenueInput = {
-  venueName: string;
+  name: string;
   address: string;
   state?: string;
   postalCode: string;
