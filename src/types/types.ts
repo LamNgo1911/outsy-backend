@@ -113,6 +113,7 @@ export interface EventInput {
 }
 
 export interface EventLike {
+  id: string;
   userId: string;
   eventId: string;
   createdAt: Date;
