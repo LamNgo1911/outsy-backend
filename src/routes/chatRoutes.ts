@@ -1,19 +1,19 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   createChat,
   deleteChat,
   getAllChats,
   getChatById,
-} from '../controllers/chatController'; 
+} from '../controllers/chatController';
 
 const router = Router();
 
-router.post('/chats', createChat);
+router.post('/', createChat);
 
-router.delete('/chats/:id', deleteChat);
+router.delete('/:chatId', deleteChat);
 
-router.get('/chats', getAllChats);
+router.get('/', getAllChats);
 
-router.get('/chats/:id', getChatById);
+router.get('/:chatId', getChatById);
 
 export default router;
