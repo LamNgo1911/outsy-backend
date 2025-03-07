@@ -1,12 +1,15 @@
-import { Router } from "express";
-import { sendMessage, getMessagesByChat } from '../controllers/messageController';
+import { Router } from 'express';
+import {
+  sendMessage,
+  getMessagesByChat,
+} from '../controllers/messageController';
 
 const router = Router();
 
 // NOTE: Authentication middleware should be applied here
 // router.use(authenticateUser); // Ensure only authenticated users can send messages
 
-router.post('/chats/:chatId/messages', sendMessage);
-router.get('/chats/:chatId/messages', getMessagesByChat);
+router.post('/:chatId', sendMessage);
+router.get('/:chatId/messages', getMessagesByChat);
 
 export default router;
