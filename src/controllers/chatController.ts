@@ -11,6 +11,20 @@ export const createChat = async (req: Request, res: Response) => {
   }
 };
 
+// Update a chat
+export const updateChat = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const chat = await chatService.updateChat(id, updateData);
+    res.json(chat);
+  } catch (error) {
+    console.error('Error updating chat:', error);
+    res.status(500).json({ error: 'Failed to update chat' });
+  }
+};
+
 // Delete a chat
 export const deleteChat = async (req: Request, res: Response) => {
   const { id } = req.params;
