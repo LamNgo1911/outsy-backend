@@ -3,6 +3,7 @@ import {
   createFeedback,
   getFeedbackReceived,
   getFeedbackGiven,
+  updateFeedback,
   deleteFeedback,
 } from '../controllers/feedbackController';
 
@@ -12,10 +13,13 @@ const router = express.Router();
 router.post('/', createFeedback);
 
 // Get feedback received by a user
-router.get('received/:userId', getFeedbackReceived);
+router.get('/received', getFeedbackReceived);
 
 // Get feedback given by a user
-router.get('given/:userId', getFeedbackGiven);
+router.get('/given', getFeedbackGiven);
+
+// Update feedback
+router.put('/:id', updateFeedback);
 
 // Delete feedback
 router.delete('/:id', deleteFeedback);
