@@ -4,14 +4,17 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+
 import userRouter from "./routes/userRoutes";
 import eventRouter from "./routes/eventRoutes";
-import chatRouter from './routes/chatRoutes';
-import messageRouter from './routes/messageRoutes';
-import feedbackRouter from './routes/feedbackRoutes';
-import userchatRouter from './routes/userChatRoutes';
-import venueRouter from './routes/venueRoutes';
-import eventLikeRouter from './routes/eventLikeRoutes'
+import chatRouter from "./routes/chatRoutes";
+import messageRouter from "./routes/messageRoutes";
+import feedbackRouter from "./routes/feedbackRoutes";
+import userchatRouter from "./routes/userChatRoutes";
+import venueRouter from "./routes/venueRoutes";
+import eventLikeRouter from "./routes/eventLikeRoutes";
+import apiErrorhandler from "./middleware/apiErrorHandler";
+import notFoundError from "./middleware/notFoundError";
 // import expenseRouter from './routes/expenseRoutes';
 
 /* CONFIGURATIONS */
@@ -34,9 +37,13 @@ app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/feedback", feedbackRouter);
-app.use('/api/v1/userchat', userchatRouter);
-app.use('/api/v1/venue', venueRouter);
-app.use('/api/v1/eventlike', eventLikeRouter);
+app.use("/api/v1/userchat", userchatRouter);
+app.use("/api/v1/venue", venueRouter);
+app.use("/api/v1/eventlike", eventLikeRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
+
+/* ERROR HANDLING */
+app.use(notFoundError);
+app.use(apiErrorhandler as express.ErrorRequestHandler);
 
 export default app;
