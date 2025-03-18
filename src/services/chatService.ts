@@ -10,22 +10,31 @@ const createChat = async (): Promise<Chat> => {
   throw new Error('Failed to create chat');
 };
 
-// Delete a chat
-const deleteChat = async (id: string): Promise<Chat> => {
-  const chat = await prisma.chat.delete({
+// Update a chat
+const updateChat = async (id: string, data: Partial<Chat>): Promise<Chat> => {
+  const chat = await prisma.chat.update({
     where: { id },
-    include: { users: true, messages: true },
+    data,
+    include: { userChats: true, messages: true },
   });
   if (chat) {
     return chat;
   }
-  throw new Error('Failed to delete chat');
+  throw new Error('Failed to update chat');
+};
+
+// Delete a chat
+const deleteChat = async (id: string): Promise<void> => {
+  await prisma.chat.delete({
+    where: { id },
+    include: { userChats: true, messages: true },
+  });
 };
 
 // Get all chats
 const getAllChats = async (): Promise<Chat[]> => {
   const chats = await prisma.chat.findMany({
-    include: { users: true, messages: true },
+    include: { userChats: true, messages: true },
   });
   if (chats) {
     return chats;
@@ -37,7 +46,7 @@ const getAllChats = async (): Promise<Chat[]> => {
 const getChatById = async (id: string): Promise<Chat | null> => {
   const chat = await prisma.chat.findUnique({
     where: { id },
-    include: { users: true, messages: true },
+    include: { userChats: true, messages: true },
   });
   if (chat) {
     return chat;
@@ -45,4 +54,4 @@ const getChatById = async (id: string): Promise<Chat | null> => {
   throw new Error('Failed to fetch chat');
 };
 
-export default { createChat, deleteChat, getAllChats, getChatById };
+export default { createChat, deleteChat, getAllChats, getChatById, updateChat };
