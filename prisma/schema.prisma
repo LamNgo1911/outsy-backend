@@ -57,9 +57,9 @@ model Chat {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  users    UserChat[]
-  messages Message[]
-  matches  Match[]    @relation("MatchChat")
+  userChats UserChat[]
+  messages  Message[]
+  matches   Match[]    @relation("MatchChat")
 }
 
 model UserChat {
