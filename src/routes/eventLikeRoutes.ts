@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.get("/all/:userId", getAllLikedEvent);
+router.get("/", getAllLikedEvent);
 
 router.get("/:eventLikeId", getLikedEventById);
 
