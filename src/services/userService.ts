@@ -71,7 +71,7 @@ const updateUser = async (
   id: string,
   userUpdateInput: UserUpdateInput
 ): Promise<void> => {
-  const updatedUser = await prisma.user.update({
+  await prisma.user.update({
     where: { id },
     data: userUpdateInput,
   });

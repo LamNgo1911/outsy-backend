@@ -11,6 +11,16 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
 };
 
+export const markMessagesAsRead = async (req: Request, res: Response) => {
+  const { chatId, userId } = req.body;
+  try {
+    await messageService.markMessagesAsRead(chatId, userId);
+    res.status(200).json({ message: 'Messages marked as read' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to mark messages as read' });
+  }
+};
+
 export const getMessagesByChat = async (req: Request, res: Response) => {
   const { chatId } = req.params;
   try {

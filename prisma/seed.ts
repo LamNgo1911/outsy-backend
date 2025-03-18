@@ -26,18 +26,20 @@ async function deleteAllData(orderedFileNames: string[]) {
 async function main() {
   const dataDirectory = path.join(__dirname, 'data');
 
-  // const jsonFiles = [
-  //   'user.json',
-  //   'chat.json',
-  //   'userChat.json',
-  //   'message.json',
-  // ];
+  const jsonFiles = [
+    'user.json',
+    'chat.json',
+    'userChat.json',
+    'message.json',
+    // 'event.json',
+    'feedback.json',
+  ];
 
   // Get all files in the directory
-  const allFiles = fs.readdirSync(dataDirectory);
+  // const allFiles = fs.readdirSync(dataDirectory);
 
   // Filter to get only the .json files
-  const jsonFiles = allFiles.filter((file) => path.extname(file) === '.json');
+  // const jsonFiles = allFiles.filter((file) => path.extname(file) === '.json');
 
   await deleteAllData(jsonFiles);
 
