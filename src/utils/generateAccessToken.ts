@@ -3,7 +3,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 
 const generateAccessToken = (user: User): string => {
   const secret = process.env.JWT_ACCESS_SECRET;
-  const accessTokenExpiration = process.env.ACCESS_TOKEN_EXPIRATION as string;
+  const accessTokenExpiration = process.env.ACCESS_TOKEN_EXPIRATION;
 
   if (!secret) {
     throw new Error(
@@ -11,8 +11,14 @@ const generateAccessToken = (user: User): string => {
     );
   }
 
+  if (!accessTokenExpiration) {
+    throw new Error(
+      "ACCESS_TOKEN_EXPIRATION is not defined in environment variables"
+    );
+  }
+
   const options: SignOptions = {
-    expiresIn: parseInt(accessTokenExpiration, 10) || "15m",
+    expiresIn: (accessTokenExpiration as jwt.SignOptions["expiresIn"]) || "15m",
   };
 
   return jwt.sign({ userId: user.id, email: user.email }, secret, options);

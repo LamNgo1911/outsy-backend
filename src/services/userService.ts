@@ -3,7 +3,7 @@ import {
   User,
   UserInput,
   UserUpdateInput,
-  UserPreferences,
+  Preference,
   UserStats,
 } from "../types/types";
 import {
@@ -34,15 +34,6 @@ const getCachedUser = (userId: string): User | null => {
 const cacheUser = (user: User) => {
   userCache.set(user.id, { user, timestamp: Date.now() });
 };
-
-// Helper function to convert Prisma user to our User type
-const convertPrismaUserToUser = (prismaUser: any): User => ({
-  ...prismaUser,
-  bio: prismaUser.bio ?? undefined,
-  profilePicture: prismaUser.profilePicture ?? undefined,
-  location: prismaUser.location ?? undefined,
-  igUrl: prismaUser.igUrl ?? undefined,
-});
 
 // Enhanced user retrieval with filtering and pagination
 const getUsers = async (
@@ -123,13 +114,14 @@ const getUsers = async (
             feedbacksReceived: true,
           },
         },
+        preferences: true,
       },
     }),
     prisma.user.count({ where }),
   ]);
 
   return {
-    users: prismaUsers.map(convertPrismaUserToUser),
+    users: prismaUsers,
     total,
   };
 };
@@ -163,12 +155,13 @@ const getUserById = async (id: string): Promise<User> => {
           feedbacksReceived: true,
         },
       },
+      preferences: true,
     },
   });
 
   if (!prismaUser) throw new NotFoundError("User not found");
 
-  const user = convertPrismaUserToUser(prismaUser);
+  const user = prismaUser;
   // Cache the user
   cacheUser(user);
   return user;
@@ -185,11 +178,12 @@ const getUserByEmail = async (email: string): Promise<User> => {
           feedbacksReceived: true,
         },
       },
+      preferences: true,
     },
   });
 
   if (!prismaUser) throw new NotFoundError("User not found");
-  return convertPrismaUserToUser(prismaUser);
+  return prismaUser;
 };
 
 const createUser = async (input: UserInput): Promise<User> => {
@@ -233,15 +227,14 @@ const createUser = async (input: UserInput): Promise<User> => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const defaultPreferences: UserPreferences = {
-    activity: ["food"],
+  const defaultPreferences = {
+    activities: ["food"],
     distance: 10,
-    ageRange: { min: 18, max: 35 },
-    notifications: {
-      matches: true,
-      messages: true,
-      eventUpdates: true,
-    },
+    ageRangeMin: 18,
+    ageRangeMax: 35,
+    matchNotif: true,
+    messageNotif: true,
+    eventNotif: true,
   };
 
   const user = await prisma.user.create({
@@ -260,10 +253,13 @@ const createUser = async (input: UserInput): Promise<User> => {
       status: "ACTIVE",
       role: "USER",
       onlineStatus: onlineStatus ?? false,
-      preferences: (preferences ?? defaultPreferences) as Prisma.InputJsonValue,
+      preferences: {
+        create: preferences ?? defaultPreferences,
+      },
       igUrl,
     },
     include: {
+      preferences: true,
       _count: {
         select: {
           hostedEvents: true,
@@ -273,7 +269,6 @@ const createUser = async (input: UserInput): Promise<User> => {
       },
     },
   });
-
   return user;
 };
 
@@ -285,16 +280,11 @@ const updateUser = async (
   if (!user) throw new NotFoundError("User not found");
 
   // Validate unique fields if they're being updated
-  if (
-    userUpdateInput.email ||
-    userUpdateInput.username ||
-    userUpdateInput.igUrl
-  ) {
+  if (userUpdateInput.username || userUpdateInput.igUrl) {
     const existingUser = await prisma.user.findFirst({
       where: {
         id: { not: id },
         OR: [
-          ...(userUpdateInput.email ? [{ email: userUpdateInput.email }] : []),
           ...(userUpdateInput.username
             ? [{ username: userUpdateInput.username }]
             : []),
@@ -304,12 +294,6 @@ const updateUser = async (
     });
 
     if (existingUser) {
-      if (
-        userUpdateInput.email &&
-        existingUser.email === userUpdateInput.email
-      ) {
-        throw new BadRequestError("Email already taken");
-      }
       if (
         userUpdateInput.username &&
         existingUser.username === userUpdateInput.username
@@ -327,14 +311,21 @@ const updateUser = async (
     }
   }
 
-  if (userUpdateInput.password) {
-    userUpdateInput.password = await bcrypt.hash(userUpdateInput.password, 10);
-  }
+  const { preferences, ...otherUpdateInputs } = userUpdateInput;
 
   const updatedUser = await prisma.user.update({
     where: { id },
-    data: { ...userUpdateInput, updatedAt: new Date() },
+    data: {
+      ...otherUpdateInputs,
+      ...(preferences && {
+        preferences: {
+          update: preferences,
+        },
+      }),
+      updatedAt: new Date(),
+    },
     include: {
+      preferences: true,
       _count: {
         select: {
           hostedEvents: true,
@@ -393,6 +384,7 @@ const toggleOnlineStatus = async (
           feedbacksReceived: true,
         },
       },
+      preferences: true,
     },
   });
 
@@ -413,10 +405,10 @@ const searchUsersForHangout = async (
 ): Promise<User[]> => {
   const { gender, ageRange, distance = 10 } = preferences;
 
-  return prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       status: "ACTIVE",
-      location, // In a real app, use geospatial queries
+      location,
       interests: { hasSome: interests },
       ...(gender && { gender }),
       ...(ageRange && {
@@ -435,10 +427,13 @@ const searchUsersForHangout = async (
           feedbacksReceived: true,
         },
       },
+      preferences: true,
     },
     take: 10,
     orderBy: [{ onlineStatus: "desc" }, { updatedAt: "desc" }],
   });
+
+  return users;
 };
 
 const getUserStats = async (userId: string): Promise<UserStats> => {
@@ -493,28 +488,28 @@ const getUserStats = async (userId: string): Promise<UserStats> => {
 
 const updateUserPreferences = async (
   userId: string,
-  preferences: Partial<UserPreferences>
+  preferences: Partial<Preference>
 ): Promise<User> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { preferences: true },
+    include: { preferences: true },
   });
 
   if (!user) throw new NotFoundError("User not found");
 
-  const currentPreferences = user.preferences as unknown as UserPreferences;
-  const updatedPreferences = {
-    ...currentPreferences,
-    ...preferences,
-  } as const;
-
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: {
-      preferences: updatedPreferences as Prisma.InputJsonValue,
+      preferences: {
+        upsert: {
+          create: preferences,
+          update: preferences,
+        },
+      },
       updatedAt: new Date(),
     },
     include: {
+      preferences: true,
       _count: {
         select: {
           hostedEvents: true,
@@ -530,6 +525,47 @@ const updateUserPreferences = async (
   return updatedUser;
 };
 
+const updatePassword = async (
+  id: string,
+  oldPassword: string,
+  newPassword: string
+): Promise<User> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new NotFoundError("User not found");
+
+  // Verify old password
+  const isValidPassword = await bcrypt.compare(oldPassword, user.password);
+  if (!isValidPassword) {
+    throw new UnauthorizedError("Current password is incorrect");
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: {
+      password: hashedPassword,
+      updatedAt: new Date(),
+    },
+    include: {
+      preferences: true,
+      _count: {
+        select: {
+          hostedEvents: true,
+          guestMatches: true,
+          feedbacksReceived: true,
+        },
+      },
+    },
+  });
+
+  // Clear user cache
+  clearUserCache(id);
+  return updatedUser;
+};
+
 export default {
   getUsers,
   getUserById,
@@ -541,4 +577,5 @@ export default {
   searchUsersForHangout,
   getUserStats,
   updateUserPreferences,
+  updatePassword,
 };
