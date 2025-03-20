@@ -22,12 +22,12 @@ model User {
   firstName      String
   lastName       String
   gender         String
-  birthdate      DateTime
-  bio            String?
-  profilePicture String?
-  location       String
-  interests      String[]
-  status         Status // e.g., "active", "banned", "inactive"
+  birthdate      DateTime // For age-based matching or filtering
+  bio            String? // Short description for personality
+  profilePicture String? // Visual appeal for hangout pairing
+  location       String // Broad location for proximity matching
+  interests      String[] // E.g., ["food", "drinks", "hiking"]
+  status         Status   @default(ACTIVE) // ACTIVE, BANNED, INACTIVE
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
@@ -36,19 +36,26 @@ model User {
   updatedAt    DateTime @updatedAt
   igUrl        String? // Instagram URL
 
-  /**
-   * Virtual columns (relations) do not exist as a physical column in the database table
-   * but behaves like one for querying and data access purposes.
-   * It allows you to access related data from another table
-   * without explicitly storing it in the current table.
-   */
+  // Relations
   chats             UserChat[]
-  feedbacksReceived Feedback[]  @relation("FeedbackRecipient")
-  feedbacksGiven    Feedback[]  @relation("FeedbackGiver")
-  hostedEvents      Event[]     @relation("EventHost")
+  feedbacksReceived Feedback[]     @relation("FeedbackRecipient")
+  feedbacksGiven    Feedback[]     @relation("FeedbackGiver")
+  hostedEvents      Event[]        @relation("EventHost")
   eventLikes        EventLike[]
-  hostMatches       Match[]     @relation("MatchHost")
-  guestMatches      Match[]     @relation("MatchGuest")
+  hostMatches       Match[]        @relation("MatchHost")
+  guestMatches      Match[]        @relation("MatchGuest")
+  refreshTokens     RefreshToken[] // New relation
+}
+
+// RefreshToken model to store the refresh tokens for users
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique // Hashed refresh token
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime // Expiration date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // Chat model to store the chat rooms between users
