@@ -1,15 +1,36 @@
-import {
-  EventStatus,
-  EventType,
-  LikeStatus,
-  MatchStatus,
-  Prisma,
-  Status,
-} from "@prisma/client"; // ✅ Import Status properly
+import { Status, Role } from "@prisma/client"; // ✅ Import Status properly
 
-// User Type (For Reading Data)
-export interface User {
+// Base interfaces for common properties
+interface BaseEntity {
   id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Preference related types
+export interface Preference extends BaseEntity {
+  userId: string;
+  activities: string[];
+  distance: number;
+  ageRangeMin: number;
+  ageRangeMax: number;
+  matchNotif: boolean;
+  messageNotif: boolean;
+  eventNotif: boolean;
+}
+
+export interface PreferenceInput {
+  activities?: string[];
+  distance?: number;
+  ageRangeMin?: number;
+  ageRangeMax?: number;
+  matchNotif?: boolean;
+  messageNotif?: boolean;
+  eventNotif?: boolean;
+}
+
+// User related types
+export interface User extends BaseEntity {
   username: string;
   email: string;
   password: string;
@@ -17,23 +38,18 @@ export interface User {
   lastName: string;
   gender: string;
   birthdate: Date;
-  bio?: string | null;
-  profilePicture?: string | null;
+  bio: string | null;
+  profilePicture: string | null;
   location: string;
   interests: string[];
   status: Status;
-
-  // Activity & Preferences
+  role: Role;
   onlineStatus: boolean;
-  preferences: Prisma.JsonValue; // ✅ Correct for reading
-  createdAt: Date;
-  updatedAt: Date;
-  igUrl?: string | null;
+  preferences: Preference | null;
+  igUrl: string | null;
 }
 
-// User Input Type (For Creating a User)
 export interface UserInput {
-  id: string;
   username: string;
   email: string;
   password: string;
@@ -41,46 +57,37 @@ export interface UserInput {
   lastName: string;
   gender: string;
   birthdate: Date;
-  bio?: string | null;
-  profilePicture?: string | null;
+  bio?: string;
+  profilePicture?: string;
   location: string;
-  interests: string[];
-  status: Status;
-
-  // Activity & Preferences
+  interests?: string[];
   onlineStatus?: boolean;
-  preferences: Prisma.InputJsonValue; // ✅ Correct for writing
-  createdAt: Date;
-  updatedAt: Date;
-  igUrl?: string | null;
+  preferences?: PreferenceInput;
+  igUrl?: string;
 }
 
-// User Update Type (For Updating a User)
 export interface UserUpdateInput {
   username?: string;
-  email?: string;
   password?: string;
   firstName?: string;
   lastName?: string;
   gender?: string;
   birthdate?: Date;
-  bio?: string | null;
-  profilePicture?: string | null;
+  bio?: string;
+  profilePicture?: string;
   location?: string;
   interests?: string[];
   status?: Status;
-
-  // Activity & Preferences
   onlineStatus?: boolean;
-  preferences?: Prisma.InputJsonValue; // ✅ Correct for writing
-  igUrl?: string | null;
+  preferences?: PreferenceInput;
+  igUrl?: string;
 }
 
 // Chat Interface
 export interface Chat {
   id: string;
-  isActive: boolean;
-  createdAt: Date;
+  users: User[];
+  messages: Message[];
 }
 
 // Message Interface
@@ -98,40 +105,55 @@ export interface Message {
 export interface Event {
   id: string;
   hostId: string;
-  name: string;
-  description: string | null;
-  type: EventType;
-  date: Date;
-  venueId: string;
-  status: EventStatus;
-  capacity: number;
-  createdAt: Date;
-  updatedAt: Date;
+  host: User;
+  guests: User[];
+  category: string;
+  price?: number;
+  images?: string[];
+  requirements?: string[];
 }
 
 export interface EventInput {
-  hostId: string;
-  name: string;
-  description?: string;
-  type: EventType;
+  title: string;
+  description: string;
   date: Date;
-  venueId: string;
-  status: EventStatus;
+  location: string;
+  maxGuests: number;
+  category: string;
+  price?: number;
+  images?: string[];
+  requirements?: string[];
 }
 
-export interface EventLike {
-  id: string;
-  userId: string;
-  eventId: string;
-  createdAt: Date;
-  status: LikeStatus;
-  message: string | null;
+export interface EventUpdateInput {
+  title?: string;
+  description?: string;
+  date?: Date;
+  location?: string;
+  maxGuests?: number;
+  status?: string;
+  category?: string;
+  price?: number;
+  images?: string[];
+  requirements?: string[];
 }
 
-export interface EventLikeInput {
-  userId: string;
+// Match related types
+export interface Match extends BaseEntity {
   eventId: string;
-  message: string;
+  event: Event;
+  hostId: string;
+  host: User;
+  guestId: string;
+  guest: User;
+  status: string;
+  rating?: number;
+  feedback?: string;
+}
+
+export interface MatchInput {
+  eventId: string;
+  guestId: string;
 }
 
 export type Venue = {
@@ -154,29 +176,20 @@ export type VenueInput = {
   city: string;
   country: string;
   description?: string;
-  imageUrl?: string;
+  imageUrl?: string
 };
-
-export interface Match {
-  id: string;
-  eventId: string;
-  hostId: string;
-  guestId: string;
-  chatId: string | null;
-  status: MatchStatus;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type MatchInput = {
-  eventId: string;
-  hostId: string;
-  guestId: string;
-  chatId?: string;
-  status: MatchStatus;
-};
-
 // Uncomment and define these interfaces if needed
+
+// interface Match {
+//   id: number;
+//   user1Id: number;
+//   user2Id: number;
+//   matchedAt: Date;
+//   isActive: boolean;
+//   user1: User;
+//   user2: User;
+// }
+
 // interface Like {
 //   id: number;
 //   senderId: number;
