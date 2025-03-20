@@ -36,10 +36,14 @@ app.use("/api/v1/users", userRouter); // https://localhost:8000/users
 app.use("/api/v1/events", eventRouter);
 app.use("/api/v1/chats", chatRouter);
 app.use("/api/v1/messages", messageRouter);
-app.use("/api/v1/feedback", feedbackRouter);
-app.use('/api/v1/userchat', userchatRouter);
-app.use('/api/v1/venue', venueRouter);
-app.use('/api/v1/eventlike', eventLikeRouter);
+app.use("/api/v1/feedbacks", feedbackRouter);
+app.use("/api/v1/userchats", userchatRouter);
+app.use("/api/v1/venues", venueRouter);
+app.use("/api/v1/eventlikes", eventLikeRouter);
 // app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
+
+/* ERROR HANDLING */
+app.use(notFoundError);
+app.use(apiErrorhandler);
 
 export default app;
