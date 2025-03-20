@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import userService from "../services/userService";
-import { User, UserUpdateInput, UserPreferences } from "../types/types";
+import { User, UserUpdateInput, Preference } from "../types/types";
 import { Status, Role } from "@prisma/client";
 import {
   BadRequestError,
@@ -269,7 +269,7 @@ export const updateUserPreferences = async (
 ): Promise<void> => {
   try {
     const { userId } = req.params;
-    const preferences: Partial<UserPreferences> = req.body;
+    const preferences: Partial<Preference> = req.body;
 
     const updatedUser = await userService.updateUserPreferences(
       userId,
@@ -281,4 +281,41 @@ export const updateUserPreferences = async (
   } catch (error) {
     next(error); // Propagate error to middleware
   }
+};
+
+// Update user password
+export const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    const updatedUser = await userService.updatePassword(
+      id,
+      oldPassword,
+      newPassword
+    );
+    const response = Result.success(updatedUser);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default {
+  getUsers,
+  getUserById,
+  getUserByEmail,
+  createUser,
+  updateUser,
+  deleteUser,
+  toggleOnlineStatus,
+  searchUsersForHangout,
+  getUserStats,
+  updateUserPreferences,
+  updatePassword,
 };

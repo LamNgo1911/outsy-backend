@@ -94,28 +94,6 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new UnauthorizedError("No token provided");
-    }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = authService.verifyAccessToken(token);
-
-    res.json({
-      success: true,
-      data: {
-        userId: decoded.userId,
-        email: decoded.email,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 const updateUserRole = async (
   req: Request,
   res: Response,
@@ -154,11 +132,24 @@ const updateUserRole = async (
   }
 };
 
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Since authMiddleware has already verified the token and attached user data
+    // We can simply return the user data
+    res.json({
+      success: true,
+      data: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   signup,
   login,
   refreshToken,
   logout,
-  verifyToken,
   updateUserRole,
+  verifyToken,
 };

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../error/apiError";
-import authService from "../services/authService";
 import prisma from "../config/prisma";
 
 // Extend Express Request type to include user
@@ -21,17 +20,14 @@ export const adminCheck = async (
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new UnauthorizedError("No token provided");
+    // Since authMiddleware has already verified the token and attached user data
+    if (!req.user?.userId) {
+      throw new UnauthorizedError("User not authenticated");
     }
-
-    const token = authHeader.split(" ")[1];
-    const decoded = authService.verifyAccessToken(token);
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
+      where: { id: req.user.userId },
       select: { role: true },
     });
 
@@ -39,8 +35,6 @@ export const adminCheck = async (
       throw new UnauthorizedError("Access denied. Admin privileges required.");
     }
 
-    // Add user info to request for later use
-    req.user = decoded;
     next();
   } catch (error) {
     next(error);

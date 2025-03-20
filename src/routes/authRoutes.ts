@@ -2,6 +2,7 @@ import { Router } from "express";
 import authController from "../controllers/authController";
 import { validateRequest } from "../middleware/validateRequest";
 import { adminCheck } from "../middleware/adminCheck";
+import { authMiddleware } from "../middleware/authMiddleware";
 import { z } from "zod";
 
 const router = Router();
@@ -45,7 +46,7 @@ const updateUserRoleSchema = z.object({
   }),
 });
 
-// Public routes
+// Public routes (no auth required)
 router.post("/signup", validateRequest(signupSchema), authController.signup);
 router.post("/login", validateRequest(loginSchema), authController.login);
 router.post(
@@ -53,18 +54,23 @@ router.post(
   validateRequest(refreshTokenSchema),
   authController.refreshToken
 );
+
+// Apply authentication middleware to all routes below
+router.use(authMiddleware);
+
+// Protected routes (auth required)
+router.get("/verify", authController.verifyToken);
 router.post(
   "/logout",
   validateRequest(refreshTokenSchema),
   authController.logout
 );
-router.get("/verify", authController.verifyToken);
 
-// Admin-only routes
+// Admin routes (auth + admin required)
 router.patch(
   "/users/:userId/role",
-  adminCheck,
   validateRequest(updateUserRoleSchema),
+  adminCheck,
   authController.updateUserRole
 );
 

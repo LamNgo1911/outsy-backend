@@ -68,7 +68,6 @@ export interface UserInput {
 
 export interface UserUpdateInput {
   username?: string;
-  email?: string;
   password?: string;
   firstName?: string;
   lastName?: string;
