@@ -44,6 +44,6 @@ app.use("/api/v1/eventlike", eventLikeRouter);
 
 /* ERROR HANDLING */
 app.use(notFoundError);
-app.use(apiErrorhandler as express.ErrorRequestHandler);
+app.use(apiErrorhandler);
 
 export default app;
