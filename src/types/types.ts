@@ -83,27 +83,15 @@ export interface UserUpdateInput {
   igUrl?: string;
 }
 
-// Chat Interface
-export interface Chat {
-  id: string;
-  users: User[];
-  messages: Message[];
-}
-
-// Message Interface
-export interface Message {
-  id: number;
-  chatId: string;
-  senderId: string;
-  content: string;
-  sentAt: Date;
-  isRead: boolean;
-  chat: Chat;
-}
-
-// Event Interfaces
-export interface Event {
-  id: string;
+// Event related types
+export interface Event extends BaseEntity {
+  title: string;
+  description: string;
+  date: Date;
+  location: string;
+  maxGuests: number;
+  currentGuests: number;
+  status: string;
   hostId: string;
   host: User;
   guests: User[];
@@ -156,53 +144,99 @@ export interface MatchInput {
   guestId: string;
 }
 
-export type Venue = {
-  id: string;
-  name: string;
-  address: string;
-  state: string | null;
-  postalCode: string;
-  city: string;
-  country: string;
-  description: string | null;
-  imageUrl: string | null;
-};
+export interface MatchUpdateInput {
+  status?: string;
+  rating?: number;
+  feedback?: string;
+}
 
-export type VenueInput = {
-  name: string;
-  address: string;
-  state?: string;
-  postalCode: string;
-  city: string;
-  country: string;
-  description?: string;
-  imageUrl?: string
-};
-// Uncomment and define these interfaces if needed
+// Response types
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
-// interface Match {
-//   id: number;
-//   user1Id: number;
-//   user2Id: number;
-//   matchedAt: Date;
-//   isActive: boolean;
-//   user1: User;
-//   user2: User;
-// }
+export interface UserStats {
+  totalEvents: number;
+  totalMatches: number;
+  totalFeedbacksReceived: number;
+  totalFeedbacksGiven: number;
+  recentFeedbacks: {
+    text: string;
+    createdAt: Date;
+  }[];
+  eventBreakdown: {
+    hosted: number;
+    completed: number;
+    cancelled: number;
+  };
+  matchBreakdown: {
+    total: number;
+    completed: number;
+    cancelled: number;
+  };
+}
 
-// interface Like {
-//   id: number;
-//   senderId: number;
-//   receiverId: number;
-//   sentAt: Date;
-//   sender: User;
-//   receiver: User;
-// }
+// Filter types
+export interface UserFilters {
+  location?: string;
+  interests?: string[];
+  gender?: string;
+  status?: Status;
+  role?: Role;
+  onlineStatus?: boolean;
+  ageRange?: {
+    min: number;
+    max: number;
+  };
+  searchTerm?: string;
+}
 
-// interface Photo {
-//   id: number;
-//   userId: number;
-//   url: string;
-//   uploadedAt: Date;
-//   user: User;
-// }
+export interface EventFilters {
+  location?: string;
+  category?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  status?: string;
+  searchTerm?: string;
+}
+
+// Pagination types
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+// Auth related types
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData extends UserInput {
+  confirmPassword: string;
+}
+
+export interface AuthResponse {
+  user: Omit<User, "password">;
+  accessToken: string;
+  refreshToken: string;
+}
+
+// Utility types
+export type WithoutPassword<T> = Omit<T, "password">;
+export type WithOptional<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;
+export type WithRequired<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
