@@ -1,51 +1,72 @@
 import prisma from "../config/prisma";
 import { User, UserInput, UserUpdateInput } from "../types/types";
+import { NotFoundError, BadRequestError } from "../error/apiError";
+import bcrypt from "bcrypt";
 
-// Get all users
-const getUsers = async (): Promise<User[]> => {
-  const users = await prisma.user.findMany();
+const getUsers = async (
+  filters: { location?: string; interests?: string[]; gender?: string } = {}
+): Promise<User[]> => {
+  const { location, interests, gender } = filters;
 
-  return users;
+  return prisma.user.findMany({
+    where: {
+      status: "ACTIVE",
+      ...(location && { location }),
+      ...(interests && { interests: { hasSome: interests } }),
+      ...(gender && { gender }),
+    },
+    orderBy: { updatedAt: "desc" },
+  });
 };
 
-// Get a user by ID
 const getUserById = async (id: string): Promise<User> => {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: { hostedEvents: true, guestMatches: true },
+  });
 
-  if (user) {
-    return user;
-  }
-
-  throw new Error("User not found");
+  if (!user) throw new NotFoundError("User not found");
+  return user;
 };
 
-// Create a new user
-const createUser = async ({
-  id,
-  username,
-  email,
-  password,
-  firstName,
-  lastName,
-  gender,
-  birthdate,
-  bio,
-  profilePicture,
-  location,
-  interests,
-  status,
-  onlineStatus,
-  preferences,
-  createdAt,
-  updatedAt,
-  igUrl,
-}: UserInput): Promise<User> => {
-  const newUser = await prisma.user.create({
+const getUserByEmail = async (email: string): Promise<User> => {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) throw new NotFoundError("User not found");
+  return user;
+};
+
+const createUser = async (input: UserInput): Promise<User> => {
+  const {
+    username,
+    email,
+    password,
+    firstName,
+    lastName,
+    gender,
+    birthdate,
+    bio,
+    profilePicture,
+    location,
+    interests,
+    onlineStatus,
+    preferences,
+    igUrl,
+  } = input;
+
+  const existingUser = await prisma.user.findFirst({
+    where: { OR: [{ username }, { email }] },
+  });
+
+  if (existingUser)
+    throw new BadRequestError("Username or email already taken");
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  return prisma.user.create({
     data: {
-      id,
       username,
       email,
-      password,
+      password: hashedPassword,
       firstName,
       lastName,
       gender,
@@ -54,38 +75,77 @@ const createUser = async ({
       profilePicture,
       location,
       interests,
-      status,
-      onlineStatus,
-      preferences,
-      createdAt,
-      updatedAt,
+      status: "ACTIVE",
+      onlineStatus: onlineStatus ?? false,
+      preferences: preferences ?? { activity: ["food"], distance: 10 },
       igUrl,
     },
   });
-
-  return newUser;
 };
 
-// Update a user by ID
 const updateUser = async (
   id: string,
   userUpdateInput: UserUpdateInput
-): Promise<void> => {
-  const updatedUser = await prisma.user.update({
+): Promise<User> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new NotFoundError("User not found");
+
+  if (userUpdateInput.password) {
+    userUpdateInput.password = await bcrypt.hash(userUpdateInput.password, 10);
+  }
+
+  return prisma.user.update({
     where: { id },
-    data: userUpdateInput,
+    data: { ...userUpdateInput, updatedAt: new Date() },
   });
 };
 
-// Delete a user by ID
 const deleteUser = async (id: string): Promise<void> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new NotFoundError("User not found");
+
   await prisma.user.delete({ where: { id } });
+};
+
+const toggleOnlineStatus = async (
+  id: string,
+  onlineStatus: boolean
+): Promise<User> => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) throw new NotFoundError("User not found");
+
+  return prisma.user.update({
+    where: { id },
+    data: { onlineStatus },
+  });
+};
+
+const searchUsersForHangout = async (
+  location: string,
+  interests: string[],
+  gender?: string,
+  excludeId?: string
+): Promise<User[]> => {
+  return prisma.user.findMany({
+    where: {
+      status: "ACTIVE",
+      location,
+      interests: { hasSome: interests },
+      ...(gender && { gender }),
+      NOT: excludeId ? { id: excludeId } : undefined,
+    },
+    take: 10,
+    orderBy: { onlineStatus: "desc" },
+  });
 };
 
 export default {
   getUsers,
   getUserById,
+  getUserByEmail,
   createUser,
   updateUser,
   deleteUser,
+  toggleOnlineStatus,
+  searchUsersForHangout,
 };
