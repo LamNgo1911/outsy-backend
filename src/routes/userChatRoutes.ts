@@ -2,8 +2,8 @@ import express from 'express';
 import {
   addUserToChat,
   removeUserFromChat,
-  getUsersByChat,
-  getChatsByUser,
+  getUsersByChatId,
+  getChatsByUserId,
 } from '../controllers/userChatController';
 
 const router = express.Router();
@@ -15,9 +15,9 @@ router.post('/', addUserToChat);
 router.delete('/', removeUserFromChat);
 
 // Get all users in a chat
-router.get('/:chatId/users', getUsersByChat);
+router.get('/:chatId/users', getUsersByChatId);
 
 // Get all chats of a user
-router.get('/:userId/chats', getChatsByUser);
+router.get('/:userId/chats', getChatsByUserId);
 
 export default router;
