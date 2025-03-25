@@ -13,11 +13,6 @@ enum Status {
   INACTIVE
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 // User model to store user information
 model User {
   id             String   @id @default(cuid())
@@ -27,58 +22,33 @@ model User {
   firstName      String
   lastName       String
   gender         String
-  birthdate      DateTime // For age-based matching or filtering
-  bio            String? // Short description for personality
-  profilePicture String? // Visual appeal for hangout pairing
-  location       String // Broad location for proximity matching
-  interests      String[] // E.g., ["food", "drinks", "hiking"]
-  status         Status   @default(ACTIVE) // ACTIVE, BANNED, INACTIVE
-  role           Role     @default(USER) // USER, ADMIN
+  birthdate      DateTime
+  bio            String?
+  profilePicture String?
+  location       String
+  interests      String[]
+  status         Status // e.g., "active", "banned", "inactive"
 
   // Activity & Preferences
   onlineStatus Boolean  @default(false) // Whether the user is currently online
+  preferences  Json // E.g., gender, age range, distance for matching
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   igUrl        String? // Instagram URL
 
-  // Relations
-  preferences       Preference?
+  /**
+   * Virtual columns (relations) do not exist as a physical column in the database table
+   * but behaves like one for querying and data access purposes.
+   * It allows you to access related data from another table
+   * without explicitly storing it in the current table.
+   */
   chats             UserChat[]
-  feedbacksReceived Feedback[]     @relation("FeedbackRecipient")
-  feedbacksGiven    Feedback[]     @relation("FeedbackGiver")
-  hostedEvents      Event[]        @relation("EventHost")
+  feedbacksReceived Feedback[]  @relation("FeedbackRecipient")
+  feedbacksGiven    Feedback[]  @relation("FeedbackGiver")
+  hostedEvents      Event[]     @relation("EventHost")
   eventLikes        EventLike[]
-  hostMatches       Match[]        @relation("MatchHost")
-  guestMatches      Match[]        @relation("MatchGuest")
-  refreshTokens     RefreshToken[] // New relation
-}
-
-model Preference {
-  id           String   @id @default(cuid())
-  userId       String   @unique
-  activities   String[]
-  distance     Int      @default(10)
-  ageRangeMin  Int      @default(18)
-  ageRangeMax  Int      @default(35)
-  matchNotif   Boolean  @default(true)
-  messageNotif Boolean  @default(true)
-  eventNotif   Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relation
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// RefreshToken model to store the refresh tokens for users
-model RefreshToken {
-  id        String   @id @default(cuid())
-  token     String   @unique // Hashed refresh token
-  userId    String
-  createdAt DateTime @default(now())
-  expiresAt DateTime // Expiration date
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hostMatches       Match[]     @relation("MatchHost")
+  guestMatches      Match[]     @relation("MatchGuest")
 }
 
 // Chat model to store the chat rooms between users
