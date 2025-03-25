@@ -40,7 +40,7 @@ app.use("/api/v1/event-likes", eventLikeRouter);
 app.use("/api/v1/matches", matchRouter);
 
 /* ERROR HANDLING */
-app.use(notFoundError);
-app.use(apiErrorhandler);
+// app.use(notFoundError);
+// app.use(apiErrorhandler);
 
 export default app;
