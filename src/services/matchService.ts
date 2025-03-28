@@ -2,7 +2,7 @@ import prisma from "../config/prisma";
 import { Match, MatchInput } from "../types/types";
 
 const getMatches = async (): Promise<Match[]> => {
-  const matches = await prisma.match.findMany()
+  const matches = await prisma.match.findMany();
   return matches;
 };
 
