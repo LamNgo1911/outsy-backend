@@ -222,6 +222,14 @@ export interface Match extends BaseEntity {
   chat?: Chat;
 }
 
+export interface MatchInput {
+  eventId: string;
+  guestId: string;
+  hostId: string;
+  chatId?: string | null;
+  status?: MatchStatus;
+}
+
 export interface EventLike {
   id: string;
   userId: string;
