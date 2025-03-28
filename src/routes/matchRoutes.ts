@@ -1,11 +1,11 @@
 import express from "express";
 import matchController from "../controllers/matchController";
-import { authenticateToken } from "../middleware/auth";
+import authMiddleware from "../middleware/authMiddleware";
 
 const router = express.Router();
 
 // Apply authentication middleware to all routes
-router.use(authenticateToken);
+router.use(authMiddleware);
 
 // Create a new match
 router.post("/", matchController.createMatch);
