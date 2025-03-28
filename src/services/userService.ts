@@ -3,14 +3,23 @@ import { User, UserInput, UserUpdateInput } from "../types/types";
 
 // Get all users
 const getUsers = async (): Promise<User[]> => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany({
+    include: {
+      preferences: true,
+    },
+  });
 
   return users;
 };
 
 // Get a user by ID
 const getUserById = async (id: string): Promise<User> => {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      preferences: true,
+    },
+  });
 
   if (user) {
     return user;
@@ -56,10 +65,17 @@ const createUser = async ({
       interests,
       status,
       onlineStatus,
-      preferences,
+      preferences: preferences
+        ? {
+            create: preferences,
+          }
+        : undefined,
       createdAt,
       updatedAt,
       igUrl,
+    },
+    include: {
+      preferences: true,
     },
   });
 
@@ -71,9 +87,20 @@ const updateUser = async (
   id: string,
   userUpdateInput: UserUpdateInput
 ): Promise<void> => {
+  const { preferences, ...rest } = userUpdateInput;
   await prisma.user.update({
     where: { id },
-    data: userUpdateInput,
+    data: {
+      ...rest,
+      ...(preferences && {
+        preferences: {
+          upsert: {
+            create: preferences,
+            update: preferences,
+          },
+        },
+      }),
+    },
   });
 };
 
