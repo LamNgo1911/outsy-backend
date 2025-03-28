@@ -15,6 +15,12 @@ export interface User {
   updatedAt: Date;
 }
 
+export interface BaseEntity {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Preference related types
 export interface Preference extends BaseEntity {
   userId: string;
@@ -174,12 +180,6 @@ export interface EventLike {
   event?: Event;
 }
 
-export interface EventLikeInput {
-  userId: string;
-  eventId: string;
-  message: string;
-}
-
 // Venue related types
 export interface Venue {
   id: string;
@@ -289,28 +289,6 @@ export interface RefreshToken extends BaseEntity {
   user?: User;
 }
 
-export type Venue = {
-  id: string;
-  name: string;
-  address: string;
-  state: string | null;
-  postalCode: string;
-  city: string;
-  country: string;
-  description: string | null;
-  imageUrl: string | null;
-};
-
-export type VenueInput = {
-  name: string;
-  address: string;
-  state?: string;
-  postalCode: string;
-  city: string;
-  country: string;
-  description?: string;
-  imageUrl?: string;
-};
 // Uncomment and define these interfaces if needed
 
 // interface Match {
