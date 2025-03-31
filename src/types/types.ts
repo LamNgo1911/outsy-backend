@@ -3,7 +3,6 @@ import {
   EventType,
   LikeStatus,
   MatchStatus,
-  Prisma,
   Status,
   Role,
 } from "@prisma/client"; // ✅ Import Status properly
@@ -118,8 +117,7 @@ export interface UserUpdateInput {
 }
 
 // Event related types
-export interface Event {
-  id: string;
+export interface Event extends BaseEntity {
   hostId: string;
   name: string;
   description: string | null;
@@ -128,8 +126,6 @@ export interface Event {
   venueId: string;
   status: EventStatus;
   capacity: number;
-  createdAt: Date;
-  updatedAt: Date;
 
   // Relations
   host?: User;
@@ -159,11 +155,9 @@ export interface EventUpdateInput {
 }
 
 // Event Like related types
-export interface EventLike {
-  id: string;
+export interface EventLike extends BaseEntity {
   userId: string;
   eventId: string;
-  createdAt: Date;
   status: LikeStatus;
   message: string | null;
 

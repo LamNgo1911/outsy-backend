@@ -1,24 +1,28 @@
-import { EventStatus, LikeStatus } from "@prisma/client";
-import { Request, Response } from "express";
-import { EventInput, EventLikeInput } from "../types/types";
+import { NextFunction, Request, Response } from "express";
+import { EventLikeInput } from "../types/types";
 import eventLikeService from "../services/eventLikeService";
+import { Result } from "../utils/Result";
 
 export const getAllLikedEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   const { userId } = req.params;
   try {
     const allLikedEvents = await eventLikeService.getAllLikedEvent(userId);
-    res.status(200).json(allLikedEvents);
+    const serverResponse = Result.success(allLikedEvents);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const getLikedEventById = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   const { eventLikeId } = req.params;
   try {
@@ -29,13 +33,14 @@ export const getLikedEventById = async (
       res.status(404).json({ message: "The liked event was not found! " });
     }
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const createLikedEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const newEventLikeRequestBody: EventLikeInput = req.body;
@@ -45,14 +50,15 @@ export const createLikedEvent = async (
     });
     res.status(201).json(newEvent);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
     console.log(error);
   }
 };
 
 export const updateLikedEventStatus = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { eventLikeId } = req.params;
@@ -64,13 +70,14 @@ export const updateLikedEventStatus = async (
     );
     res.status(204).json(updatedEvent);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const deleteLikedEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { eventLikeId } = req.params;
@@ -80,6 +87,6 @@ export const deleteLikedEvent = async (
       .status(200)
       .json({ message: `Delete liked event ${eventLikeId} successfully.` });
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };

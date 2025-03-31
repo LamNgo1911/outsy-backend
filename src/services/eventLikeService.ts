@@ -22,12 +22,15 @@ const getSpecificLikedEvent = async (id: string): Promise<EventLike> => {
   return likedEvent;
 };
 
-const createLikeEvent = async (requestedEventLike: EventLikeInput): Promise<EventLike> => {
+const createLikeEvent = async (
+  requestedEventLike: EventLikeInput
+): Promise<EventLike> => {
   const newLikedEvent = await prisma.eventLike.create({
     data: {
       ...requestedEventLike,
       status: LikeStatus.PENDING,
       createdAt: new Date(),
+      updatedAt: new Date(),
     },
   });
 
@@ -40,7 +43,7 @@ const updateLikedEventStatus = async (
 ): Promise<EventLike> => {
   const newUpdatedEventLike = await prisma.eventLike.update({
     where: { id },
-    data: { status },
+    data: { status, updatedAt: new Date() },
   });
   return newUpdatedEventLike;
 };
@@ -54,5 +57,5 @@ export default {
   getAllLikedEvent,
   createLikeEvent,
   updateLikedEventStatus,
-  deleteLikedEvent
+  deleteLikedEvent,
 };
