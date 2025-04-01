@@ -1,9 +1,50 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
-import { Event, EventInput } from "../types/types";
+import { EventFilters, Event, EventInput } from "../types/eventTypes";
+import { PaginationParams } from "../types/types";
 
-const getEvents = async (): Promise<Event[]> => {
-  const events = await prisma.event.findMany();
-  return events;
+const getEvents = async (
+  filters: EventFilters = {},
+  pagination: PaginationParams = {}
+): Promise<{ events: Event[]; total: number }> => {
+  const {
+    type = "FOOD",
+    status = "OPEN",
+    venueId,
+    hostId,
+    dateRange,
+  } = filters;
+  const { page = 1, limit = 10 } = pagination;
+  const skip = (page - 1) * limit;
+
+  const where: Prisma.EventWhereInput = {
+    ...(type && { type }),
+    ...(status && { status }),
+    ...(dateRange && {
+      date: {
+        lte: new Date(dateRange.start),
+        gte: new Date(dateRange.end),
+      },
+    }),
+    ...(venueId && { venueId }),
+    ...(hostId && { hostId }),
+  };
+
+  const [events, total] = await Promise.all([
+    prisma.event.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { date: "asc" },
+      include: {
+        venue: true,
+        host: true,
+      },
+    }),
+    prisma.event.count({ where }),
+  ]);
+
+  return { events, total };
 };
 
 const getEventById = async (eventId: string): Promise<Event> => {
