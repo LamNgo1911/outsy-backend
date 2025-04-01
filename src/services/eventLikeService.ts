@@ -1,6 +1,6 @@
 import { LikeStatus } from "@prisma/client";
 import prisma from "../config/prisma";
-import { EventLike, EventLikeInput } from "../types/types";
+import { EventLike, EventLikeInput } from "../types/eventTypes";
 
 const getAllLikedEvent = async (userId: string): Promise<EventLike[]> => {
   const allLikedEvents = await prisma.eventLike.findMany({ where: { userId } });
