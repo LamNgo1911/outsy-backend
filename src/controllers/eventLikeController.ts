@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { EventLikeInput } from "../types/types";
+import { EventLikeInput } from "../types/eventTypes";
 import eventLikeService from "../services/eventLikeService";
 import { Result } from "../utils/Result";
 

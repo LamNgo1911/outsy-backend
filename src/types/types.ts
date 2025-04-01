@@ -1,14 +1,12 @@
 import {
-  EventStatus,
-  EventType,
-  LikeStatus,
   MatchStatus,
   Status,
   Role,
 } from "@prisma/client"; // ✅ Import Status properly
+import { EventLike, Event } from "./eventTypes";
 
 // Base interfaces for common properties
-interface BaseEntity {
+export interface BaseEntity {
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -114,89 +112,6 @@ export interface UserUpdateInput {
   onlineStatus?: boolean;
   igUrl?: string | null;
   preferences?: PreferenceInput;
-}
-
-// Event related types
-export interface Event extends BaseEntity {
-  hostId: string;
-  name: string;
-  description: string | null;
-  type: EventType;
-  date: Date;
-  venueId: string;
-  status: EventStatus;
-  capacity: number;
-
-  // Relations
-  host?: User;
-  venue?: Venue;
-  eventLikes?: EventLike[];
-  matches?: Match[];
-}
-
-export interface EventInput {
-  hostId: string;
-  name: string;
-  description?: string;
-  type: EventType;
-  date: Date;
-  venueId: string;
-  status: EventStatus;
-}
-
-export interface EventUpdateInput {
-  name?: string;
-  description?: string;
-  type?: EventType;
-  date?: Date;
-  venueId?: string;
-  status?: EventStatus;
-  capacity?: number;
-}
-
-// Event Like related types
-export interface EventLike extends BaseEntity {
-  userId: string;
-  eventId: string;
-  status: LikeStatus;
-  message: string | null;
-
-  // Relations
-  user?: User;
-  event?: Event;
-}
-
-export interface EventLikeInput {
-  userId: string;
-  eventId: string;
-  message: string;
-}
-
-// Venue related types
-export interface Venue {
-  id: string;
-  name: string;
-  address: string;
-  state: string | null;
-  postalCode: string;
-  city: string;
-  country: string;
-  description: string | null;
-  imageUrl: string | null;
-
-  // Relations
-  events?: Event[];
-}
-
-export interface VenueInput {
-  name: string;
-  address: string;
-  state?: string;
-  postalCode: string;
-  city: string;
-  country: string;
-  description?: string;
-  imageUrl?: string;
 }
 
 // Match related types
@@ -319,21 +234,6 @@ export interface UserFilters {
     min: number;
     max: number;
   };
-  searchTerm?: string;
-}
-
-export interface EventFilters {
-  location?: string;
-  category?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  priceRange?: {
-    min: number;
-    max: number;
-  };
-  status?: EventStatus;
   searchTerm?: string;
 }
 

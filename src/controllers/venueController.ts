@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { VenueInput } from "../types/types";
+import { VenueInput } from "../types/venueTypes";
 import venueService from "../services/venueService";
 import { Result } from "../utils/Result";
 
