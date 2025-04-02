@@ -68,7 +68,6 @@ export interface EventFilters {
   type?: EventType;
   status?: EventStatus;
   venueId?: string;
-  hostId?: string;
   dateRange?: {
     start: Date;
     end: Date;
