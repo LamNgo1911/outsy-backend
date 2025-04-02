@@ -3,10 +3,10 @@ import {
   Status,
   Role,
 } from "@prisma/client"; // ✅ Import Status properly
-import { EventLike, Event } from "./eventTypes";
+import { EventLike } from "./eventTypes";
 
 // Base interfaces for common properties
-export interface BaseEntity {
+interface BaseEntity {
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -70,7 +70,6 @@ export interface User {
 }
 
 export interface UserInput {
-  id: string;
   username: string;
   email: string;
   password: string;

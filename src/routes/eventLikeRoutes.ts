@@ -19,6 +19,8 @@ const router = Router();
 
 router.use(authMiddleware);
 
+router.get("/", getAllLikedEvent);
+
 router.get(
   "/all/:userId",
   validateRequest(allEventLikeSchema),

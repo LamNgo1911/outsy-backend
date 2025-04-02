@@ -30,13 +30,13 @@ export const removeUserFromChat = async (
 };
 
 // Get all users in a chat
-export const getUsersInChat = async (
+export const getUsersByChat = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { chatId } = req.params;
-    const users = await UserChatService.getUsersInChat(chatId);
+    const users = await UserChatService.getUsersByChat(chatId);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching users in chat' });

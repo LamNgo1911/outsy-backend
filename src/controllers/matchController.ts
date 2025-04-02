@@ -1,56 +1,80 @@
 import { Request, Response } from "express";
 import matchService from "../services/matchService";
-import { MatchInput, MatchUpdateInput } from "../types/types";
-import { NotFoundError, BadRequestError } from "../error/apiError";
+import { MatchInput } from "../types/types";
+import { MatchStatus } from "@prisma/client";
 
-// Create a new match
-const createMatch = async (req: Request, res: Response) => {
-  const matchInput: MatchInput = req.body;
-  const match = await matchService.createMatch(matchInput);
-  res.status(201).json(match);
+export const getMatches = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const matches = await matchService.getMatches();
+    res.status(200).json(matches);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 };
 
-// Get match by ID
-const getMatchById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const match = await matchService.getMatchById(id);
-  res.json(match);
+export const getMatchById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { matchId } = req.params;
+  try {
+    const match = await matchService.getMatchById(matchId);
+    if (match) {
+      res.status(200).json(match);
+    } else {
+      res.status(404).json({ message: "Match not found! " });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 };
 
-// Get matches by event ID
-const getMatchesByEventId = async (req: Request, res: Response) => {
-  const { eventId } = req.params;
-  const matches = await matchService.getMatchesByEventId(eventId);
-  res.json(matches);
+export const createMatch = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const newMatchRequestBody: MatchInput = req.body;
+
+    const newMatch = await matchService.createMatch({
+      ...newMatchRequestBody,
+      status: MatchStatus.CONFIRMED,
+    });
+    res.status(201).json(newMatch);
+  } catch (error) {
+    res.status(500).json({ error: error });
+    console.log(error);
+  }
 };
 
-// Get matches by user ID
-const getMatchesByUserId = async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const matches = await matchService.getMatchesByUserId(userId);
-  res.json(matches);
+export const updateMatch = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { matchId } = req.params;
+    const requestedData: MatchInput = req.body;
+
+    const updatedMatch = await matchService.updateMatch(matchId, requestedData);
+    res.status(204).json(updatedMatch);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 };
 
-// Update match status
-const updateMatch = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const matchUpdateInput: MatchUpdateInput = req.body;
-  const match = await matchService.updateMatch(id, matchUpdateInput);
-  res.json(match);
-};
+export const deleteMatch = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { matchId } = req.params;
 
-// Delete match
-const deleteMatch = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  await matchService.deleteMatch(id);
-  res.status(204).send();
-};
-
-export default {
-  createMatch,
-  getMatchById,
-  getMatchesByEventId,
-  getMatchesByUserId,
-  updateMatch,
-  deleteMatch,
+    await matchService.deleteMatch(matchId);
+    res.status(200).json({ message: `Delete match ${matchId} successfully.` });
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
 };
