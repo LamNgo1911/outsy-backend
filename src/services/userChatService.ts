@@ -71,7 +71,7 @@ const removeUserFromChat = async (userId: string, chatId: string) => {
 };
 
 // Get all users in a chat
-const getUsersInChat = async (chatId: string): Promise<User[]> => {
+const getUsersByChat = async (chatId: string): Promise<User[]> => {
   const userChats = await prisma.userChat.findMany({
     where: { chatId },
     include: { user: true }, // Include user details
@@ -100,6 +100,6 @@ const getChatsByUser = async (userId: string): Promise<Chat[]> => {
 export default {
   addUserToChat,
   removeUserFromChat,
-  getUsersInChat,
+  getUsersByChat,
   getChatsByUser,
 };

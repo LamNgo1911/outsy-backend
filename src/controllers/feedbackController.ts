@@ -6,34 +6,53 @@ export const createFeedback = async (req: Request, res: Response) => {
   const { userId, giverId, text } = req.body;
 
   try {
-    const feedback = await feedbackService.createFeedback(userId, giverId, text);
+    const feedback = await feedbackService.createFeedback(
+      userId,
+      giverId,
+      text
+    );
     res.status(201).json(feedback);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create feedback' });
+    res.status(500).json({ error });
   }
 };
 
 // Get feedback received by a user
 export const getFeedbackReceived = async (req: Request, res: Response) => {
-  const { userId } = req.params;
+  const { userId } = req.body;
 
   try {
     const feedbacks = await feedbackService.getFeedbackReceived(userId);
     res.status(200).json(feedbacks);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch feedback' });
+    res.status(500).json({ error });
   }
 };
 
 // Get feedback given by a user
 export const getFeedbackGiven = async (req: Request, res: Response) => {
-  const { giverId } = req.params;
+  const { giverId } = req.body;
 
   try {
     const feedbacks = await feedbackService.getFeedbackGiven(giverId);
     res.status(200).json(feedbacks);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch feedback' });
+    res.status(500).json({ error });
+  }
+};
+
+// Update feedback
+export const updateFeedback = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { giverId, text } = req.body;
+
+  try {
+    const feedback = await feedbackService.updateFeedback(id, giverId, text);
+    res.status(200).json(feedback);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    }
   }
 };
 
@@ -45,6 +64,6 @@ export const deleteFeedback = async (req: Request, res: Response) => {
     await feedbackService.deleteFeedback(id);
     res.status(204).send(); // No content
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete feedback' });
+    res.status(500).json({ error });
   }
 };

@@ -1,17 +1,27 @@
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import chatService from '../services/chatService';
 
-const prisma = new PrismaClient();
-
 // Create a new chat
 export const createChat = async (req: Request, res: Response) => {
-  const { userIds } = req.body;
   try {
-    const chat = await chatService.createChat(userIds);
+    const chat = await chatService.createChat();
     res.status(201).json(chat);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create chat' });
+  }
+};
+
+// Update a chat
+export const updateChat = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const chat = await chatService.updateChat(id, updateData);
+    res.json(chat);
+  } catch (error) {
+    console.error('Error updating chat:', error);
+    res.status(500).json({ error: 'Failed to update chat' });
   }
 };
 

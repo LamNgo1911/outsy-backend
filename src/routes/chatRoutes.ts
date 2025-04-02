@@ -4,16 +4,19 @@ import {
   deleteChat,
   getAllChats,
   getChatById,
+  updateChat,
 } from '../controllers/chatController';
 
 const router = Router();
 
 router.post('/', createChat);
 
-router.delete('/:chatId', deleteChat);
+router.put('/:id', updateChat);
+
+router.delete('/:id', deleteChat);
 
 router.get('/', getAllChats);
 
-router.get('/:chatId', getChatById);
+router.get('/:id', getChatById);
 
 export default router;

@@ -134,6 +134,10 @@ export const createUser = async (
       onlineStatus,
       preferences,
       igUrl,
+      status: Status.ACTIVE, // Default or derived value
+      role: Role.USER, // Default or derived value
+      createdAt: new Date(), // Automatically set current date
+      updatedAt: new Date(), // Automatically set current date
     });
 
     const response = Result.success(newUser, 201);
