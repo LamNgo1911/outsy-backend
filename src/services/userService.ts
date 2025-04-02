@@ -3,58 +3,98 @@ import { User, UserInput, UserUpdateInput } from "../types/types";
 
 // Get all users
 const getUsers = async (): Promise<User[]> => {
-  const users = await prisma.user.findMany({
-    include: {
-      preferences: true,
-    },
-  });
+  const users = await prisma.user.findMany();
 
   return users;
 };
 
 // Get a user by ID
 const getUserById = async (id: string): Promise<User> => {
-  const user = await prisma.user.findUnique({
-    where: { id },
+  const user = await prisma.user.findUnique({ where: { id } });
+
+  if (!prismaUser) throw new NotFoundError("User not found");
+
+  const user = prismaUser;
+  // Cache the user
+  cacheUser(user);
+  return user;
+};
+
+const getUserByEmail = async (email: string): Promise<User> => {
+  const prismaUser = await prisma.user.findUnique({
+    where: { email },
     include: {
+      _count: {
+        select: {
+          hostedEvents: true,
+          guestMatches: true,
+          feedbacksReceived: true,
+        },
+      },
       preferences: true,
     },
   });
 
-  if (user) {
-    return user;
-  }
-
-  throw new Error("User not found");
+  if (!prismaUser) throw new NotFoundError("User not found");
+  return prismaUser;
 };
 
-// Create a new user
-const createUser = async ({
-  id,
-  username,
-  email,
-  password,
-  firstName,
-  lastName,
-  gender,
-  birthdate,
-  bio,
-  profilePicture,
-  location,
-  interests,
-  status,
-  onlineStatus,
-  preferences,
-  createdAt,
-  updatedAt,
-  igUrl,
-}: UserInput): Promise<User> => {
-  const newUser = await prisma.user.create({
+const createUser = async (input: UserInput): Promise<User> => {
+  const {
+    username,
+    email,
+    password,
+    firstName,
+    lastName,
+    gender,
+    birthdate,
+    bio,
+    profilePicture,
+    location,
+    interests = [],
+    onlineStatus,
+    preferences,
+    igUrl,
+  } = input;
+
+  // Enhanced validation
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ username }, { email }, ...(igUrl ? [{ igUrl }] : [])],
+    },
+  });
+
+  if (existingUser) {
+    if (existingUser.email === email) {
+      throw new BadRequestError("Email already taken");
+    }
+    if (existingUser.username === username) {
+      throw new BadRequestError("Username already taken");
+    }
+    if (existingUser.igUrl === igUrl) {
+      throw new BadRequestError(
+        "Instagram URL already linked to another account"
+      );
+    }
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const defaultPreferences = {
+    activities: ["food"],
+    distance: 10,
+    ageRangeMin: 18,
+    ageRangeMax: 35,
+    matchNotif: true,
+    messageNotif: true,
+    eventNotif: true,
+  };
+
+  const user = await prisma.user.create({
     data: {
-      id,
       username,
       email,
-      password,
+      password: hashedPassword,
       firstName,
       lastName,
       gender,
@@ -65,42 +105,22 @@ const createUser = async ({
       interests,
       status,
       onlineStatus,
-      preferences: preferences
-        ? {
-            create: preferences,
-          }
-        : undefined,
+      preferences,
       createdAt,
       updatedAt,
       igUrl,
     },
-    include: {
-      preferences: true,
-    },
   });
-
-  return newUser;
+  return user;
 };
 
-// Update a user by ID
 const updateUser = async (
   id: string,
   userUpdateInput: UserUpdateInput
 ): Promise<void> => {
-  const { preferences, ...rest } = userUpdateInput;
   await prisma.user.update({
     where: { id },
-    data: {
-      ...rest,
-      ...(preferences && {
-        preferences: {
-          upsert: {
-            create: preferences,
-            update: preferences,
-          },
-        },
-      }),
-    },
+    data: userUpdateInput,
   });
 };
 
@@ -112,7 +132,13 @@ const deleteUser = async (id: string): Promise<void> => {
 export default {
   getUsers,
   getUserById,
+  getUserByEmail,
   createUser,
   updateUser,
   deleteUser,
+  toggleOnlineStatus,
+  searchUsersForHangout,
+  getUserStats,
+  updateUserPreferences,
+  updatePassword,
 };
