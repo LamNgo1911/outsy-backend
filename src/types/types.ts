@@ -6,7 +6,7 @@ import {
 import { EventLike } from "./eventTypes";
 
 // Base interfaces for common properties
-interface BaseEntity {
+export interface BaseEntity {
   id: string;
   createdAt: Date;
   updatedAt: Date;
