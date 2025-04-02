@@ -8,14 +8,8 @@ import {
   Role,
 } from "@prisma/client"; // ✅ Import Status properly
 
-// User Type (For Reading Data)
-export interface User {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface BaseEntity {
+// Base interfaces for common properties
+interface BaseEntity {
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -78,9 +72,7 @@ export interface User {
   refreshTokens?: RefreshToken[];
 }
 
-// User Input Type (For Creating a User)
 export interface UserInput {
-  id: string;
   username: string;
   email: string;
   password: string;
@@ -103,7 +95,6 @@ export interface UserInput {
   preferences?: PreferenceInput;
 }
 
-// User Update Type (For Updating a User)
 export interface UserUpdateInput {
   username?: string;
   email?: string;
@@ -180,6 +171,12 @@ export interface EventLike {
   event?: Event;
 }
 
+export interface EventLikeInput {
+  userId: string;
+  eventId: string;
+  message: string;
+}
+
 // Venue related types
 export interface Venue {
   id: string;
@@ -225,18 +222,6 @@ export interface Match extends BaseEntity {
 export interface MatchInput {
   eventId: string;
   guestId: string;
-  hostId: string;
-  chatId?: string | null;
-  status?: MatchStatus;
-}
-
-export interface EventLike {
-  id: string;
-  userId: string;
-  eventId: string;
-  createdAt: Date;
-  status: LikeStatus;
-  message: string | null;
 }
 
 export interface MatchUpdateInput {
@@ -297,17 +282,50 @@ export interface RefreshToken extends BaseEntity {
   user?: User;
 }
 
-// Uncomment and define these interfaces if needed
+// Response types
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
-// interface Match {
-//   id: number;
-//   user1Id: number;
-//   user2Id: number;
-//   matchedAt: Date;
-//   isActive: boolean;
-//   user1: User;
-//   user2: User;
-// }
+export interface UserStats {
+  totalEvents: number;
+  totalMatches: number;
+  totalFeedbacksReceived: number;
+  totalFeedbacksGiven: number;
+  recentFeedbacks: {
+    text: string;
+    createdAt: Date;
+  }[];
+  eventBreakdown: {
+    hosted: number;
+    completed: number;
+    cancelled: number;
+  };
+  matchBreakdown: {
+    total: number;
+    completed: number;
+    cancelled: number;
+  };
+}
+
+// Filter types
+export interface UserFilters {
+  location?: string;
+  interests?: string[];
+  gender?: string;
+  status?: Status;
+  role?: Role;
+  onlineStatus?: boolean;
+  ageRange?: {
+    min: number;
+    max: number;
+  };
+  searchTerm?: string;
+}
 
 export interface EventFilters {
   location?: string;
