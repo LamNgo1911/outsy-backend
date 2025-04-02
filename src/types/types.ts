@@ -4,8 +4,9 @@ import {
   LikeStatus,
   MatchStatus,
   Prisma,
+  Status,
+  Role,
 } from "@prisma/client"; // ✅ Import Status properly
-import { Status, Role } from "@prisma/client"; // ✅ Import Status properly
 
 // Base interfaces for common properties
 interface BaseEntity {
@@ -37,7 +38,8 @@ export interface PreferenceInput {
 }
 
 // User related types
-export interface User extends BaseEntity {
+export interface User {
+  id: string;
   username: string;
   email: string;
   password: string;
@@ -45,15 +47,29 @@ export interface User extends BaseEntity {
   lastName: string;
   gender: string;
   birthdate: Date;
-  bio: string | null;
-  profilePicture: string | null;
+  bio?: string | null;
+  profilePicture?: string | null;
   location: string;
   interests: string[];
   status: Status;
   role: Role;
+
+  // Activity & Preferences
   onlineStatus: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  igUrl?: string | null;
+
+  // Relations
   preferences: Preference | null;
-  igUrl: string | null;
+  chats?: UserChat[];
+  feedbacksReceived?: Feedback[];
+  feedbacksGiven?: Feedback[];
+  hostedEvents?: Event[];
+  eventLikes?: EventLike[];
+  hostMatches?: Match[];
+  guestMatches?: Match[];
+  refreshTokens?: RefreshToken[];
 }
 
 export interface UserInput {
@@ -64,86 +80,143 @@ export interface UserInput {
   lastName: string;
   gender: string;
   birthdate: Date;
-  bio?: string;
-  profilePicture?: string;
+  bio?: string | null;
+  profilePicture?: string | null;
   location: string;
-  interests?: string[];
+  interests: string[];
+  status: Status;
+  role: Role;
+
+  // Activity & Preferences
   onlineStatus?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  igUrl?: string | null;
   preferences?: PreferenceInput;
-  igUrl?: string;
 }
 
 export interface UserUpdateInput {
   username?: string;
+  email?: string;
   password?: string;
   firstName?: string;
   lastName?: string;
   gender?: string;
   birthdate?: Date;
-  bio?: string;
-  profilePicture?: string;
+  bio?: string | null;
+  profilePicture?: string | null;
   location?: string;
   interests?: string[];
   status?: Status;
+  role?: Role;
+
+  // Activity & Preferences
   onlineStatus?: boolean;
+  igUrl?: string | null;
   preferences?: PreferenceInput;
-  igUrl?: string;
 }
 
 // Event related types
-export interface Event extends BaseEntity {
-  title: string;
-  description: string;
-  date: Date;
-  location: string;
-  maxGuests: number;
-  currentGuests: number;
-  status: string;
+export interface Event {
+  id: string;
   hostId: string;
-  host: User;
-  guests: User[];
-  category: string;
-  price?: number;
-  images?: string[];
-  requirements?: string[];
+  name: string;
+  description: string | null;
+  type: EventType;
+  date: Date;
+  venueId: string;
+  status: EventStatus;
+  capacity: number;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Relations
+  host?: User;
+  venue?: Venue;
+  eventLikes?: EventLike[];
+  matches?: Match[];
 }
 
 export interface EventInput {
-  title: string;
-  description: string;
+  hostId: string;
+  name: string;
+  description?: string;
+  type: EventType;
   date: Date;
-  location: string;
-  maxGuests: number;
-  category: string;
-  price?: number;
-  images?: string[];
-  requirements?: string[];
+  venueId: string;
+  status: EventStatus;
 }
 
 export interface EventUpdateInput {
-  title?: string;
+  name?: string;
   description?: string;
+  type?: EventType;
   date?: Date;
-  location?: string;
-  maxGuests?: number;
-  status?: string;
-  category?: string;
-  price?: number;
-  images?: string[];
-  requirements?: string[];
+  venueId?: string;
+  status?: EventStatus;
+  capacity?: number;
+}
+
+// Event Like related types
+export interface EventLike {
+  id: string;
+  userId: string;
+  eventId: string;
+  createdAt: Date;
+  status: LikeStatus;
+  message: string | null;
+
+  // Relations
+  user?: User;
+  event?: Event;
+}
+
+export interface EventLikeInput {
+  userId: string;
+  eventId: string;
+  message: string;
+}
+
+// Venue related types
+export interface Venue {
+  id: string;
+  name: string;
+  address: string;
+  state: string | null;
+  postalCode: string;
+  city: string;
+  country: string;
+  description: string | null;
+  imageUrl: string | null;
+
+  // Relations
+  events?: Event[];
+}
+
+export interface VenueInput {
+  name: string;
+  address: string;
+  state?: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  description?: string;
+  imageUrl?: string;
 }
 
 // Match related types
 export interface Match extends BaseEntity {
   eventId: string;
-  event: Event;
   hostId: string;
-  host: User;
   guestId: string;
-  guest: User;
-  status: string;
-  rating?: number;
-  feedback?: string;
+  chatId: string | null;
+  status: MatchStatus;
+
+  // Relations
+  event?: Event;
+  host?: User;
+  guest?: User;
+  chat?: Chat;
 }
 
 export interface MatchInput {
@@ -152,9 +225,61 @@ export interface MatchInput {
 }
 
 export interface MatchUpdateInput {
-  status?: string;
-  rating?: number;
-  feedback?: string;
+  status?: MatchStatus;
+  chatId?: string;
+}
+
+// Chat related types
+export interface Chat extends BaseEntity {
+  isActive: boolean;
+
+  // Relations
+  users?: UserChat[];
+  messages?: Message[];
+  matches?: Match[];
+}
+
+export interface UserChat {
+  userId: string;
+  chatId: string;
+
+  // Relations
+  user?: User;
+  chat?: Chat;
+}
+
+export interface Message extends BaseEntity {
+  chatId: string;
+  senderId: string;
+  content: string;
+  isRead: boolean;
+
+  // Relations
+  chat?: Chat;
+}
+
+// Feedback related types
+export interface Feedback {
+  id: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  userId: string;
+  giverId: string;
+  text: string;
+
+  // Relations
+  user?: User;
+  giver?: User;
+}
+
+// RefreshToken related types
+export interface RefreshToken extends BaseEntity {
+  token: string;
+  userId: string;
+  expiresAt: Date;
+
+  // Relations
+  user?: User;
 }
 
 // Response types
@@ -213,7 +338,7 @@ export interface EventFilters {
     min: number;
     max: number;
   };
-  status?: string;
+  status?: EventStatus;
   searchTerm?: string;
 }
 
@@ -231,7 +356,8 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface RegisterData extends UserInput {
+export interface RegisterData
+  extends Omit<UserInput, "id" | "createdAt" | "updatedAt"> {
   confirmPassword: string;
 }
 
