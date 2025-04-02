@@ -73,7 +73,6 @@ export interface User {
 }
 
 export interface UserInput {
-  id: string;
   username: string;
   email: string;
   password: string;
