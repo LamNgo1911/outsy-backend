@@ -20,10 +20,19 @@ export const createFeedback = async (req: Request, res: Response) => {
 // Get feedback received by a user
 export const getFeedbackReceived = async (req: Request, res: Response) => {
   const { userId } = req.body;
+  
+  // These are already validated by the route middleware
+  const { page, limit, sortBy, sortOrder } = req.query; 
 
   try {
-    const feedbacks = await feedbackService.getFeedbackReceived(userId);
-    res.status(200).json(feedbacks);
+    const result = await feedbackService.getFeedbackReceived(
+      userId,
+      Number(page) || 1,
+      Number(limit) || 10,
+      (sortBy as string) || 'createdAt',
+      (sortOrder as 'asc' | 'desc') || 'desc'
+    );
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error });
   }
@@ -32,10 +41,17 @@ export const getFeedbackReceived = async (req: Request, res: Response) => {
 // Get feedback given by a user
 export const getFeedbackGiven = async (req: Request, res: Response) => {
   const { giverId } = req.body;
+  const { page, limit, sortBy, sortOrder } = req.query;
 
   try {
-    const feedbacks = await feedbackService.getFeedbackGiven(giverId);
-    res.status(200).json(feedbacks);
+    const result = await feedbackService.getFeedbackGiven(
+      giverId,
+      Number(page) || 1,
+      Number(limit) || 10,
+      (sortBy as string) || 'createdAt',
+      (sortOrder as 'asc' | 'desc') || 'desc'
+    );
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error });
   }
