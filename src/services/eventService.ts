@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { EventFilters, Event, EventInput } from "../types/eventTypes";
 import { PaginationParams } from "../types/types";
-import { BadRequestError } from "../error/apiError";
+import { BadRequestError, NotFoundError } from "../error/apiError";
 
 const eventCache = new Map<string, { event: Event; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -38,8 +38,8 @@ const getEvents = async (
   const skip = (page - 1) * limit;
 
   const where: Prisma.EventWhereInput = {
-    ...(type && { type }),
-    ...(status && { status }),
+    type,
+    status,
     ...(dateRange && {
       date: {
         lte: new Date(dateRange.start),
@@ -69,7 +69,7 @@ const getEventById = async (eventId: string): Promise<Event> => {
   const event = await prisma.event.findUnique({ where: { id: eventId } });
 
   if (!event) {
-    throw new Error(`User ID ${eventId} not found.`);
+    throw new NotFoundError(`User ID ${eventId} not found.`);
   }
   
   cacheEvent(event)
@@ -90,7 +90,7 @@ const createEvent = async ({
   })
 
   if (!venueExists) {
-    throw new BadRequestError("No venue found with the provided Venue ID")
+    throw new NotFoundError("No venue found with the provided Venue ID")
   }
 
   const eventDate = new Date(date)
@@ -127,7 +127,7 @@ const updateEvent = async (
   })
 
   if (!venueExists) {
-    throw new BadRequestError("No venue found with the provided Venue ID")
+    throw new NotFoundError("No venue found with the provided Venue ID")
   }
 
   const eventDate = new Date(eventUpdateInput.date)
