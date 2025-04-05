@@ -1,16 +1,42 @@
 import { NextFunction, Request, Response } from "express";
-import { EventLikeInput } from "../types/eventTypes";
+import { EventLikeFilters, EventLikeInput } from "../types/eventTypes";
 import eventLikeService from "../services/eventLikeService";
 import { Result } from "../utils/Result";
+import { EventStatus, EventType, LikeStatus } from "@prisma/client";
+import { PaginationParams } from "../types/types";
 
 export const getAllLikedEvent = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { userId } = req.params;
   try {
-    const allLikedEvents = await eventLikeService.getAllLikedEvent(userId);
+    const { userId } = req.params;
+    const { type, status, venueId, dateRange, likeStatus, page, limit } =
+      req.query;
+    const filters: EventLikeFilters = {
+      ...(type && { type: type as EventType }),
+      ...(status && { status: status as EventStatus }),
+      ...(dateRange && {
+        dateRange: {
+          start: new Date((dateRange as string).split(",")[0]),
+          end: new Date((dateRange as string).split(",")[1]),
+        },
+      }),
+      ...(venueId && { venueId: venueId as string }),
+      ...(likeStatus && { likeStatus: likeStatus as LikeStatus }),
+    };
+
+    const pagination: PaginationParams = {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+    };
+
+    const allLikedEvents = await eventLikeService.getAllLikedEvent(
+      userId,
+      filters,
+      pagination
+    );
     const serverResponse = Result.success(allLikedEvents);
     const { statusCode, body } = serverResponse.toResponse();
     res.status(statusCode).json(body);
@@ -24,14 +50,13 @@ export const getLikedEventById = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { eventLikeId } = req.params;
   try {
+    const { eventLikeId } = req.params;
     const eventLike = await eventLikeService.getSpecificLikedEvent(eventLikeId);
-    if (eventLike) {
-      res.status(200).json(eventLike);
-    } else {
-      res.status(404).json({ message: "The liked event was not found! " });
-    }
+
+    const serverResponse = Result.success(eventLike);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
     next(error);
   }
@@ -45,13 +70,15 @@ export const createLikedEvent = async (
   try {
     const newEventLikeRequestBody: EventLikeInput = req.body;
 
-    const newEvent = await eventLikeService.createLikeEvent({
+    const newLikedEvent = await eventLikeService.createLikeEvent({
       ...newEventLikeRequestBody,
     });
-    res.status(201).json(newEvent);
+
+    const response = Result.success(newLikedEvent, 201);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
     next(error);
-    console.log(error);
   }
 };
 
@@ -64,11 +91,14 @@ export const updateLikedEventStatus = async (
     const { eventLikeId } = req.params;
     const { status } = req.body;
 
-    const updatedEvent = await eventLikeService.updateLikedEventStatus(
+    const updatedLikedEvent = await eventLikeService.updateLikedEventStatus(
       eventLikeId,
       status
     );
-    res.status(204).json(updatedEvent);
+
+    const response = Result.success(updatedLikedEvent);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
     next(error);
   }
@@ -83,9 +113,10 @@ export const deleteLikedEvent = async (
     const { eventLikeId } = req.params;
 
     await eventLikeService.deleteLikedEvent(eventLikeId);
-    res
-      .status(200)
-      .json({ message: `Delete liked event ${eventLikeId} successfully.` });
+
+    const response = Result.success(null, 204);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
     next(error);
   }
