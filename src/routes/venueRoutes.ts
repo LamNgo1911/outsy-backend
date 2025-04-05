@@ -6,14 +6,14 @@ import {
   updateVenue,
   deleteVenue,
 } from "../controllers/venueController";
-import { adminCheck } from "../middleware/adminCheck";
-import { authMiddleware } from "../middleware/authMiddleware";
+import { adminCheck } from "../middlewares/adminCheck";
+import { authMiddleware } from "../middlewares/authMiddleware";
 import {
   createVenueSchema,
   updateVenueSchema,
   venueIdSchema,
-} from "../zod-schema/venueSchema";
-import { validateRequest } from "../middleware/validateRequest";
+} from "../utils/zod-schema/venueSchema";
+import { validateRequest } from "../middlewares/validateRequest";
 
 const router = Router();
 

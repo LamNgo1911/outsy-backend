@@ -6,13 +6,13 @@ import {
   getEvents,
   updateEvent,
 } from "../controllers/eventController";
-import { validateRequest } from "../middleware/validateRequest";
+import { validateRequest } from "../middlewares/validateRequest";
 import {
   eventCreateSchema,
   eventIdSchema,
   eventUpdateSchema,
-} from "../zod-schema/eventSchema";
-import authMiddleware from "../middleware/authMiddleware";
+} from "../utils/zod-schema/eventSchema";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
