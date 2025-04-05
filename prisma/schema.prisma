@@ -92,13 +92,25 @@ model Chat {
   matches   Match[]    @relation("MatchChat")
 }
 
+// NOTE: UserChat model serves as a join table for the many-to-many relationship between User and Chat
+// This intermediate model is necessary because:
+// 1. A user can be in multiple chats
+// 2. A chat can have multiple users
+// 3. It allows storing additional information about the user's participation in a chat
+// 4. It enables efficient querying of user-chat relationships
 model UserChat {
   userId String
   chatId String
 
+  // Relations to User and Chat models
+  // Cascade deletion ensures that when a user or chat is deleted,
+  // their associations in UserChat are automatically removed
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
+  // NOTE: Composite primary key is made up of userId and chatId (2 columns)
+  // Composite primary key ensures a user can't be added to the same chat twice
+  // This prevents duplicate entries in the many-to-many relationship
   @@id([userId, chatId])
 }
 
