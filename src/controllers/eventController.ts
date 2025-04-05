@@ -1,95 +1,114 @@
-import { EventStatus } from "@prisma/client";
-import { Request, Response } from "express";
-import { EventInput } from "../types/types";
+import { EventStatus, EventType } from "@prisma/client";
+import { NextFunction, Request, Response } from "express";
 import eventService from "../services/eventService";
 import venueService from "../services/venueService";
+import { Result } from "../utils/Result";
+import { EventFilters, EventInput } from "../types/eventTypes";
+import { PaginationParams } from "../types/types";
 
-export const getEvents = async (req: Request, res: Response): Promise<void> => {
+export const getEvents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const events = await eventService.getEvents();
-    res.status(200).json(events);
+    const { type, status, dateRange, venueId, hostId, page, limit } = req.query;
+
+    const filters: EventFilters = {
+      ...(type && { type: type as EventType }),
+      ...(status && { status: status as EventStatus }),
+      ...(dateRange && {
+        dateRange: {
+          start: new Date((dateRange as string).split(",")[0]),
+          end: new Date((dateRange as string).split(",")[1]),
+        },
+      }),
+      ...(venueId && { venueId: venueId as string }),
+      ...(hostId && { hostId: hostId as string }),
+    };
+
+    const pagination: PaginationParams = {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+    };
+
+    const result = await eventService.getEvents(filters, pagination);
+    const serverResponse = Result.success(result);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const getEventById = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   const { eventId } = req.params;
   try {
     const event = await eventService.getEventById(eventId);
-    if (event) {
-      res.status(200).json(event);
-    } else {
-      res.status(404).json({ message: "Event not found! " });
-    }
+    const serverResponse = Result.success(event);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const createEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const newEventRequestBody: EventInput = req.body;
 
-    const venueExists = await venueService.getVenueById(
-      newEventRequestBody.venueId
-    );
+    const newEvent = await eventService.createEvent({
+      ...newEventRequestBody,
+      status: EventStatus.OPEN,
+    });
 
-    if (venueExists) {
-      const newEvent = await eventService.createEvent({
-        ...newEventRequestBody,
-        status: EventStatus.OPEN,
-      });
-      res.status(201).json(newEvent);
-    } else {
-      res.status(404).json({
-        error: `Can't find venue with id ${newEventRequestBody.venueId}`,
-      });
-    }
+    const response = Result.success(newEvent, 201);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
-    console.log(error);
+    next(error);
   }
 };
 
 export const updateEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { eventId } = req.params;
     const requestedData: EventInput = req.body;
 
-    const venueExists = await venueService.getVenueById(requestedData.venueId);
-
-    if (venueExists) {
-      const updatedEvent = await eventService.updateEvent(
-        eventId,
-        requestedData
-      );
-      res.status(204).json(updatedEvent);
-    }
+    const updatedEvent = await eventService.updateEvent(eventId, requestedData);
+    const response = Result.success(updatedEvent);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };
 
 export const deleteEvent = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
   try {
     const { eventId } = req.params;
 
     await eventService.deleteEvent(eventId);
-    res.status(200).json({ message: `Delete event ${eventId} successfully.` });
+    const response = Result.success(null, 204);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: error });
+    next(error);
   }
 };

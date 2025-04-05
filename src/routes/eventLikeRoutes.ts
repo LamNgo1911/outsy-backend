@@ -6,17 +6,45 @@ import {
   getLikedEventById,
   updateLikedEventStatus,
 } from "../controllers/eventLikeController";
+import authMiddleware from "../middleware/authMiddleware";
+import { validateRequest } from "../middleware/validateRequest";
+import {
+  allEventLikeSchema,
+  eventLikeCreateSchema,
+  eventLikeIdSchema,
+  eventLikeUpdateSchema,
+} from "../zod-schema/eventLikeSchema";
 
 const router = Router();
 
+router.use(authMiddleware);
+
 router.get("/", getAllLikedEvent);
 
-router.get("/:eventLikeId", getLikedEventById);
+router.get(
+  "/all/:userId",
+  validateRequest(allEventLikeSchema),
+  getAllLikedEvent
+);
 
-router.post("/", createLikedEvent);
+router.get(
+  "/:eventLikeId",
+  validateRequest(eventLikeIdSchema),
+  getLikedEventById
+);
 
-router.put("/:eventLikeId", updateLikedEventStatus);
+router.post("/", validateRequest(eventLikeCreateSchema), createLikedEvent);
 
-router.delete("/:eventLikeId", deleteLikedEvent);
+router.put(
+  "/:eventLikeId",
+  validateRequest(eventLikeUpdateSchema),
+  updateLikedEventStatus
+);
+
+router.delete(
+  "/:eventLikeId",
+  validateRequest(eventLikeIdSchema),
+  deleteLikedEvent
+);
 
 export default router;
