@@ -24,3 +24,12 @@ export interface VenueInput {
   description?: string;
   imageUrl?: string;
 }
+
+export interface VenueFilters {
+  name?: string;
+  address?: string;
+  state?: string;
+  postalCode?: string;
+  city?: string;
+  country?: string;
+}
