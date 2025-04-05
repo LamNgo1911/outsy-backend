@@ -6,14 +6,14 @@ import {
   getLikedEventById,
   updateLikedEventStatus,
 } from "../controllers/eventLikeController";
-import authMiddleware from "../middleware/authMiddleware";
-import { validateRequest } from "../middleware/validateRequest";
+import authMiddleware from "../middlewares/authMiddleware";
+import { validateRequest } from "../middlewares/validateRequest";
 import {
   allEventLikeSchema,
   eventLikeCreateSchema,
   eventLikeIdSchema,
   eventLikeUpdateSchema,
-} from "../zod-schema/eventLikeSchema";
+} from "../utils/zod-schema/eventLikeSchema";
 
 const router = Router();
 
