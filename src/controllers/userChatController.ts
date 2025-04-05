@@ -30,13 +30,13 @@ export const removeUserFromChat = async (
 };
 
 // Get all users in a chat
-export const getUsersByChat = async (
+export const getUsersByChatId = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { chatId } = req.params;
-    const users = await UserChatService.getUsersByChat(chatId);
+    const users = await UserChatService.getUsersByChatId(chatId);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching users in chat' });
@@ -44,13 +44,13 @@ export const getUsersByChat = async (
 };
 
 // Get all chats for a user
-export const getChatsByUser = async (
+export const getChatsByUserId = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { userId } = req.params;
-    const chats = await UserChatService.getChatsByUser(userId);
+    const chats = await UserChatService.getChatsByUserId(userId);
     res.status(200).json(chats);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching chats for user' });
