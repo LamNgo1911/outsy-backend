@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { UnauthorizedError } from "../error/apiError";
-import prisma from "../config/prisma";
+import { Request, Response, NextFunction } from 'express';
+import { UnauthorizedError } from '../error/apiError';
+import prisma from '../config/prisma';
 
 // Extend Express Request type to include user
 declare global {
@@ -22,7 +22,7 @@ export const adminCheck = async (
   try {
     // Since authMiddleware has already verified the token and attached user data
     if (!req.user?.userId) {
-      throw new UnauthorizedError("User not authenticated");
+      throw new UnauthorizedError('User not authenticated');
     }
 
     // Check if user is admin
@@ -31,8 +31,8 @@ export const adminCheck = async (
       select: { role: true },
     });
 
-    if (!user || user.role !== "ADMIN") {
-      throw new UnauthorizedError("Access denied. Admin privileges required.");
+    if (!user || user.role !== 'ADMIN') {
+      throw new UnauthorizedError('Access denied. Admin privileges required.');
     }
 
     next();

@@ -1,6 +1,21 @@
 import prisma from '../config/prisma';
 import { Feedback } from '@prisma/client';
 
+// Define types for the selected fields
+type FeedbackWithGiverId = {
+  id: string;
+  text: string;
+  createdAt: Date;
+  giverId: string;
+};
+
+type FeedbackWithUserId = {
+  id: string;
+  text: string;
+  createdAt: Date;
+  userId: string;
+};
+
 // Create feedback
 const createFeedback = async (
   userId: string,
@@ -24,29 +39,84 @@ const createFeedback = async (
 };
 
 // Get feedback received by a user
-const getFeedbackReceived = async (userId: string): Promise<Feedback[]> => {
+const getFeedbackReceived = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 10,
+  sortBy: string = 'createdAt',
+  sortOrder: 'asc' | 'desc' = 'desc'
+): Promise<{ feedbacks: FeedbackWithGiverId[]; total: number }> => {
   // Optional validation
   if (!userId) throw new Error('User ID is required');
-  const feedbacks = await prisma.feedback.findMany({
-    where: { userId },
-    include: { giver: true }, // Include giver details
-  });
+
+  // Calculate skip for pagination
+  const skip = (page - 1) * limit;
+
+  // Get total count and feedbacks in parallel
+  const [feedbacks, total] = await Promise.all([
+    prisma.feedback.findMany({
+      where: { userId },
+      // include: { giver: true },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        giverId: true,
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+    }),
+    prisma.feedback.count({
+      where: { userId },
+    }),
+  ]);
+
   if (feedbacks) {
-    return feedbacks;
+    return { feedbacks, total };
   }
   throw new Error('Failed to fetch feedback');
 };
 
 // Get feedback given by a user
-const getFeedbackGiven = async (giverId: string): Promise<Feedback[]> => {
+const getFeedbackGiven = async (
+  giverId: string,
+  page: number = 1,
+  limit: number = 10,
+  sortBy: string = 'createdAt',
+  sortOrder: 'asc' | 'desc' = 'desc'
+): Promise<{ feedbacks: FeedbackWithUserId[]; total: number }> => {
   // Optional validation
   if (!giverId) throw new Error('Giver ID is required');
-  const feedbacks = await prisma.feedback.findMany({
-    where: { giverId },
-    include: { user: true }, // Include recipient details
-  });
+
+  // Calculate skip for pagination
+  const skip = (page - 1) * limit;
+
+  // Get total count and feedbacks in parallel
+  const [feedbacks, total] = await Promise.all([
+    prisma.feedback.findMany({
+      where: { giverId },
+      select: {
+        id: true,
+        text: true,
+        createdAt: true,
+        userId: true,
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+    }),
+    prisma.feedback.count({
+      where: { giverId },
+    }),
+  ]);
+
   if (feedbacks) {
-    return feedbacks;
+    return { feedbacks, total };
   }
   throw new Error('Failed to fetch feedback');
 };
