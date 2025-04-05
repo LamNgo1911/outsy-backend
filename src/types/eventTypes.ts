@@ -73,3 +73,7 @@ export interface EventFilters {
     end: Date;
   };
 }
+
+export interface EventLikeFilters extends EventFilters {
+  likeStatus?: LikeStatus;
+}
