@@ -3,8 +3,8 @@ import {
   createFeedback,
   getFeedbackReceived,
   getFeedbackGiven,
-  updateFeedback,
   deleteFeedback,
+  updateFeedback,
 } from '../controllers/feedbackController';
 import { validateRequest } from '../middlewares/validateRequest';
 import { authMiddleware } from '../middlewares/authMiddleware';

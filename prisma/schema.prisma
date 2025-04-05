@@ -179,6 +179,7 @@ model EventLike {
   createdAt DateTime   @default(now())
   status    LikeStatus @default(PENDING)
   message   String? // Optional message from user showing interest
+  updatedAt DateTime   @updatedAt
 
   // Relations
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
