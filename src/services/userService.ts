@@ -167,7 +167,7 @@ const getUserById = async (id: string): Promise<User> => {
   return user;
 };
 
-const getUserByEmail = async (email: string): Promise<User> => {
+const getUserByEmail = async (email: string): Promise<User | null> => {
   const prismaUser = await prisma.user.findUnique({
     where: { email },
     include: {
@@ -182,8 +182,7 @@ const getUserByEmail = async (email: string): Promise<User> => {
     },
   });
 
-  if (!prismaUser) throw new NotFoundError("User not found");
-  return prismaUser;
+  return prismaUser || null;
 };
 
 const createUser = async (input: UserInput): Promise<User> => {

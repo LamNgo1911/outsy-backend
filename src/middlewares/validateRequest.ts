@@ -12,8 +12,11 @@ export const validateRequest = (schema: AnyZodObject) => {
       });
       next();
     } catch (error) {
+      // Check if the error is an instance of ZodError
+      console.log("Validation error:", error);
       if (error instanceof ZodError) {
         const errorMessages = error.errors.map((err) => err.message);
+
         next(new BadRequestError(errorMessages.join(", ")));
       } else {
         next(error);

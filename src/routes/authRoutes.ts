@@ -1,20 +1,20 @@
-import { Router } from 'express';
-import authController from '../controllers/authController';
-import { validateRequest } from '../middlewares/validateRequest';
-import { adminCheck } from '../middlewares/adminCheck';
-import { authMiddleware } from '../middlewares/authMiddleware';
-import { z } from 'zod';
+import { Router } from "express";
+import authController from "../controllers/authController";
+import { validateRequest } from "../middlewares/validateRequest";
+import { adminCheck } from "../middlewares/adminCheck";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { z } from "zod";
 
 const router = Router();
 
 // Validation schemas
 const signupSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    username: z.string().min(3, 'Username must be at least 3 characters'),
-    firstName: z.string().min(2, 'First name must be at least 2 characters'),
-    lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+    email: z.string().email("Invalid email format"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    username: z.string().min(3, "Username must be at least 3 characters"),
+    firstName: z.string().min(2, "First name must be at least 2 characters"),
+    lastName: z.string().min(2, "Last name must be at least 2 characters"),
     gender: z.string(),
     birthdate: z.string().transform((str) => new Date(str)),
     location: z.string(),
@@ -24,51 +24,51 @@ const signupSchema = z.object({
 
 const loginSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
-    password: z.string().min(1, 'Password is required'),
+    email: z.string().email("Invalid email format"),
+    password: z.string().min(1, "Password is required"),
   }),
 });
 
 const refreshTokenSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'Refresh token is required'),
+    refreshToken: z.string().min(1, "Refresh token is required"),
   }),
 });
 
 const updateUserRoleSchema = z.object({
   params: z.object({
-    userId: z.string().min(1, 'User ID is required'),
+    userId: z.string().min(1, "User ID is required"),
   }),
   body: z.object({
-    role: z.enum(['USER', 'ADMIN'], {
-      errorMap: () => ({ message: 'Role must be either USER or ADMIN' }),
+    role: z.enum(["USER", "ADMIN"], {
+      errorMap: () => ({ message: "Role must be either USER or ADMIN" }),
     }),
   }),
 });
 
 // Public routes (no auth required)
-router.post('/signup', validateRequest(signupSchema), authController.signup);
-router.post('/login', validateRequest(loginSchema), authController.login);
+router.post("/signup", validateRequest(signupSchema), authController.signup);
+router.post("/login", validateRequest(loginSchema), authController.login);
 router.post(
-  '/refresh-token',
+  "/refresh-token",
   validateRequest(refreshTokenSchema),
   authController.refreshToken
 );
 
-// Apply authentication middleware to all routes below
-router.use(authMiddleware);
-
 // Protected routes (auth required)
-router.get('/verify', authController.verifyToken);
+router.get("/verify", authMiddleware, authController.verifyToken);
 router.post(
-  '/logout',
+  "/logout",
+  authMiddleware,
   validateRequest(refreshTokenSchema),
   authController.logout
 );
 
 // Admin routes (auth + admin required)
+
+// Admin routes (auth + admin required)
 router.patch(
-  '/users/:userId/role',
+  "/users/:userId/role",
   validateRequest(updateUserRoleSchema),
   adminCheck,
   authController.updateUserRole
