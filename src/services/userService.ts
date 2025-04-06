@@ -269,6 +269,8 @@ const createUser = async (input: UserInput): Promise<User> => {
       },
     },
   });
+  // Cache the newly created user
+  cacheUser(user);
   return user;
 };
 
@@ -399,11 +401,12 @@ const searchUsersForHangout = async (
   preferences: {
     gender?: string;
     ageRange?: { min: number; max: number };
-    distance?: number;
+    // distance?: number; // TODO: Implement actual distance filtering if needed
   } = {},
   excludeId?: string
 ): Promise<User[]> => {
-  const { gender, ageRange, distance = 10 } = preferences;
+  // const { gender, ageRange, distance = 10 } = preferences; // Distance not used in query
+  const { gender, ageRange } = preferences;
 
   const users = await prisma.user.findMany({
     where: {

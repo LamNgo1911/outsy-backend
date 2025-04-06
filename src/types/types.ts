@@ -1,9 +1,5 @@
-import {
-  MatchStatus,
-  Status,
-  Role,
-} from "@prisma/client"; // ✅ Import Status properly
-import { EventLike } from "./eventTypes";
+import { MatchStatus, Status, Role } from "@prisma/client"; // ✅ Import Status properly
+import { EventLike, Event } from "./eventTypes"; // Import Event here
 
 // Base interfaces for common properties
 export interface BaseEntity {
