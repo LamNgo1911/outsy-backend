@@ -12,7 +12,7 @@ import {
   createVenueSchema,
   updateVenueSchema,
   venueIdSchema,
-} from "../utils/zod-schema/venueSchema";
+} from "../utils/validation/venueSchema";
 import { validateRequest } from "../middlewares/validateRequest";
 
 const router = Router();
