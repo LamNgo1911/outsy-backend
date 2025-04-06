@@ -1,6 +1,6 @@
 import express from "express";
-import matchController from "../controllers/matchController";
-import authMiddleware from "../middleware/authMiddleware";
+import * as matchController from "../controllers/matchController"; // Use named import
+import authMiddleware from "../middlewares/authMiddleware"; // Corrected middleware path
 
 const router = express.Router();
 

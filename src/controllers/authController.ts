@@ -20,6 +20,7 @@ interface UpdateRoleRequest {
 const signup = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userInput: UserInput = req.body;
+
     const { user, accessToken, refreshToken } = await authService.signup(
       userInput
     );

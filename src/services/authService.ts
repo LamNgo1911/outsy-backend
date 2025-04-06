@@ -42,7 +42,6 @@ const signup = async (
   if (existingUser) {
     throw new BadRequestError("User with this email already exists");
   }
-
   const user = await userService.createUser(input);
   const accessToken = generateAccessToken(user);
   const refreshToken = await generateRefreshToken(user);
