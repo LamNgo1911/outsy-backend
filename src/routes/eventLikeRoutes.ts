@@ -13,7 +13,7 @@ import {
   eventLikeCreateSchema,
   eventLikeIdSchema,
   eventLikeUpdateSchema,
-} from "../utils/zod-schema/eventLikeSchema";
+} from "../utils/validation/eventLikeSchema";
 
 const router = Router();
 

@@ -11,7 +11,7 @@ import {
   eventCreateSchema,
   eventIdSchema,
   eventUpdateSchema,
-} from "../utils/zod-schema/eventSchema";
+} from "../utils/validation/eventSchema";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
