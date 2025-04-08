@@ -1,32 +1,20 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import {
   createChat,
   deleteChat,
-  getChats,
   getChatById,
-  updateChat
+  getChats,
+  updateChat,
 } from '../controllers/chatController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { validateRequest } from '../middlewares/validateRequest';
+import {
+  chatIdSchema,
+  chatQuerySchema,
+  chatUpdateSchema,
+} from '../utils/validation/chatSchema';
 
 const router = Router();
-
-// Validation schemas
-const chatIdSchema = z.object({
-  params: z.object({
-    id: z.string().min(1, 'Chat ID is required'),
-  }),
-});
-
-const chatUpdateSchema = z.object({
-  params: z.object({
-    id: z.string().min(1, 'Chat ID is required'),
-  }),
-  body: z.object({
-    isActive: z.boolean().optional(),
-  }),
-});
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware);
@@ -35,7 +23,7 @@ router.use(authMiddleware);
 router.post('/', createChat);
 
 // Get all chats with pagination and filtering
-router.get('/', getChats);
+router.get('/', validateRequest(chatQuerySchema), getChats);
 
 // Get chat by ID
 router.get('/:id', validateRequest(chatIdSchema), getChatById);

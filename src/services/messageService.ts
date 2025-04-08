@@ -1,7 +1,8 @@
 import prisma from '../config/prisma';
 import { Message } from '@prisma/client';
+import { MessageResponse } from '../types/messageTypes';
 
-// Add a new message
+// Send a message
 const sendMessage = async (
   chatId: string,
   senderId: string,
@@ -16,7 +17,10 @@ const sendMessage = async (
     include: { chat: true },
   });
 
-  return message;
+  if (message) {
+    return message;
+  }
+  throw new Error('Failed to send message');
 };
 
 // Mark messages as read
@@ -32,12 +36,22 @@ const markMessagesAsRead = async (
 };
 
 // Get messages by chat
-const getMessagesByChat = async (chatId: string): Promise<Message[]> => {
-  const messages = await prisma.message.findMany({
-    where: { chatId },
-    orderBy: { sentAt: 'asc' },
-  });
-  return messages;
+const getMessagesByChat = async (chatId: string): Promise<MessageResponse> => {
+  const [messages, total] = await Promise.all([
+    prisma.message.findMany({
+      where: { chatId },
+      orderBy: { sentAt: 'desc' },
+    }),
+    prisma.message.count({
+      where: { chatId },
+    }),
+  ]);
+
+  return { messages, total };
 };
 
-export default { sendMessage, markMessagesAsRead, getMessagesByChat };
+export default {
+  sendMessage,
+  markMessagesAsRead,
+  getMessagesByChat,
+};
