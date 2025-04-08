@@ -4,7 +4,7 @@ import { Result } from '../utils/Result';
 import { UserChatFilters, UserChatInput } from '../types/userChatTypes';
 
 // Add a user to a chat
-const addUserToChat = async (
+export const addUserToChat = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,7 +22,7 @@ const addUserToChat = async (
 };
 
 // Remove a user from a chat
-const removeUserFromChat = async (
+export const removeUserFromChat = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -40,7 +40,7 @@ const removeUserFromChat = async (
 };
 
 // Get all users in a chat with pagination and filtering
-const getUsersByChatId = async (
+export const getUsersByChatId = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -77,7 +77,7 @@ const getUsersByChatId = async (
 };
 
 // Get all chats for a user with pagination and filtering
-const getChatsByUserId = async (
+export const getChatsByUserId = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -111,11 +111,4 @@ const getChatsByUserId = async (
   } catch (error) {
     next(error);
   }
-};
-
-export default {
-  addUserToChat,
-  removeUserFromChat,
-  getUsersByChatId,
-  getChatsByUserId,
 };
