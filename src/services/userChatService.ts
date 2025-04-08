@@ -1,14 +1,17 @@
+import { UserChat } from '@prisma/client';
 import prisma from '../config/prisma';
-import { Chat, User, UserChat } from '@prisma/client';
+import { PaginationParams } from '../types/types';
+import {
+  UserChatFilters,
+  UserChatInput,
+  UserChatResponse,
+} from '../types/userChatTypes';
 
 // Add a user to a chat
-const addUserToChat = async (
-  userId: string,
-  chatId: string
-): Promise<UserChat> => {
+const addUserToChat = async (input: UserChatInput): Promise<UserChat> => {
   // Check if the user and chat exist
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  const chat = await prisma.chat.findUnique({ where: { id: chatId } });
+  const user = await prisma.user.findUnique({ where: { id: input.userId } });
+  const chat = await prisma.chat.findUnique({ where: { id: input.chatId } });
 
   if (!user || !chat) {
     throw new Error('User or Chat not found');
@@ -18,8 +21,8 @@ const addUserToChat = async (
   const existingUserChat = await prisma.userChat.findUnique({
     where: {
       userId_chatId: {
-        userId,
-        chatId,
+        userId: input.userId,
+        chatId: input.chatId,
       },
     },
   });
@@ -32,8 +35,8 @@ const addUserToChat = async (
   // Otherwise, create the UserChat record
   const userChat = await prisma.userChat.create({
     data: {
-      userId,
-      chatId,
+      userId: input.userId,
+      chatId: input.chatId,
     },
   });
 
@@ -44,13 +47,13 @@ const addUserToChat = async (
 };
 
 // Remove a user from a chat
-const removeUserFromChat = async (userId: string, chatId: string) => {
+const removeUserFromChat = async (input: UserChatInput): Promise<void> => {
   // Check if the UserChat record exists
   const userChat = await prisma.userChat.findUnique({
     where: {
       userId_chatId: {
-        userId,
-        chatId,
+        userId: input.userId,
+        chatId: input.chatId,
       },
     },
   });
@@ -63,38 +66,101 @@ const removeUserFromChat = async (userId: string, chatId: string) => {
   await prisma.userChat.delete({
     where: {
       userId_chatId: {
-        userId,
-        chatId,
+        userId: input.userId,
+        chatId: input.chatId,
       },
     },
   });
 };
 
-// Get all users in a chat
-const getUsersByChatId = async (chatId: string): Promise<User[]> => {
-  const userChats = await prisma.userChat.findMany({
-    where: { chatId },
-    include: { user: true }, // Include user details
-  });
+// Get all users in a chat with pagination and filtering
+const getUsersByChatId = async (
+  chatId: string,
+  filters: UserChatFilters = {},
+  pagination: PaginationParams = {}
+): Promise<UserChatResponse> => {
+  const {
+    page = 1,
+    limit = 10,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = pagination;
+  const { dateRange } = filters;
 
-  if (userChats) {
-    return userChats.map((userChat) => userChat.user);
-  }
-  throw new Error('Failed to fetch users in chat');
+  const skip = (page - 1) * limit;
+
+  const where = {
+    chatId,
+    ...(dateRange && {
+      createdAt: {
+        gte: dateRange.start,
+        lte: dateRange.end,
+      },
+    }),
+  };
+
+  const [userChats, total] = await Promise.all([
+    prisma.userChat.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      include: { user: true },
+    }),
+    prisma.userChat.count({ where }),
+  ]);
+
+  return {
+    users: userChats.map((userChat) => userChat.user),
+    total,
+  };
 };
 
-// Get all chats for a user
-const getChatsByUserId = async (userId: string): Promise<Chat[]> => {
-  const userChats = await prisma.userChat.findMany({
-    where: { userId },
-    include: { chat: true }, // Include chat details
-  });
+// Get all chats for a user with pagination and filtering
+const getChatsByUserId = async (
+  userId: string,
+  filters: UserChatFilters = {},
+  pagination: PaginationParams = {}
+): Promise<UserChatResponse> => {
+  const {
+    page = 1,
+    limit = 10,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = pagination;
+  const { dateRange } = filters;
 
-  if (userChats) {
-    return userChats.map((userChat) => userChat.chat);
-  }
+  const skip = (page - 1) * limit;
 
-  throw new Error('Failed to fetch chats for user');
+  const where = {
+    userId,
+    ...(dateRange && {
+      createdAt: {
+        gte: dateRange.start,
+        lte: dateRange.end,
+      },
+    }),
+  };
+
+  const [userChats, total] = await Promise.all([
+    prisma.userChat.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: sortOrder,
+      },
+      include: { chat: true },
+    }),
+    prisma.userChat.count({ where }),
+  ]);
+
+  return {
+    chats: userChats.map((userChat) => userChat.chat),
+    total,
+  };
 };
 
 export default {
