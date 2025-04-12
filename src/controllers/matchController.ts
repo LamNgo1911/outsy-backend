@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import matchService from "../services/matchService";
-import { MatchInput, MatchUpdateInput } from "../types/types";
+import { MatchFilters, MatchInput, PaginationParams } from "../types/types";
+import { Result } from "../utils/Result";
+import { EventStatus, EventType, MatchStatus } from "@prisma/client";
 
 // Get match by ID
 export const getMatchById = async (
@@ -8,12 +10,14 @@ export const getMatchById = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { id } = req.params; // Corrected parameter name
   try {
-    const match = await matchService.getMatchById(id); // Use id
-    res.status(200).json(match);
+    const { matchId } = req.params;
+    const match = await matchService.getMatchById(matchId);
+    const serverResponse = Result.success(match);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };
 
@@ -23,12 +27,31 @@ export const getMatchesByEventId = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { eventId } = req.params;
   try {
-    const matches = await matchService.getMatchesByEventId(eventId);
-    res.status(200).json(matches);
+    const { eventId } = req.params;
+    const { eventType, status, eventStatus, page, limit } = req.query;
+
+    const filters: MatchFilters = {
+      ...(eventType && { eventType: eventType as EventType }),
+      ...(status && { status: status as MatchStatus }),
+      ...(eventStatus && { eventStatus: eventStatus as EventStatus }),
+    };
+
+    const pagination: PaginationParams = {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+    };
+
+    const matches = await matchService.getMatchesByEventId(
+      eventId,
+      filters,
+      pagination
+    );
+    const serverResponse = Result.success(matches);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };
 
@@ -38,12 +61,30 @@ export const getMatchesByUserId = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { userId } = req.params; // Assuming userId is passed as a param
   try {
-    const matches = await matchService.getMatchesByUserId(userId);
-    res.status(200).json(matches);
+    const { eventType, status, page, limit } = req.query;
+    const { userId } = req.params;
+
+    const filters: MatchFilters = {
+      ...(eventType && { eventType: eventType as EventType }),
+      ...(status && { status: status as MatchStatus }),
+    };
+
+    const pagination: PaginationParams = {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+    };
+
+    const matches = await matchService.getMatchesByUserId(
+      userId,
+      filters,
+      pagination
+    );
+    const serverResponse = Result.success(matches);
+    const { statusCode, body } = serverResponse.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };
 
@@ -56,9 +97,11 @@ export const createMatch = async (
   try {
     const newMatchRequestBody: MatchInput = req.body;
     const newMatch = await matchService.createMatch(newMatchRequestBody);
-    res.status(201).json(newMatch);
+    const response = Result.success(newMatch, 201);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };
 
@@ -69,13 +112,15 @@ export const updateMatch = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params; // Corrected parameter name
-    const requestedData: MatchUpdateInput = req.body; // Use MatchUpdateInput type
+    const { matchId } = req.params;
+    const status = req.body;
 
-    const updatedMatch = await matchService.updateMatch(id, requestedData); // Use id
-    res.status(200).json(updatedMatch); // Return 200 OK with updated match
+    const updatedMatch = await matchService.updateMatch(matchId, status);
+    const response = Result.success(updatedMatch);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };
 
@@ -86,11 +131,13 @@ export const deleteMatch = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params; // Corrected parameter name
+    const { matchId } = req.params;
 
-    await matchService.deleteMatch(id); // Use id
-    res.status(204).send(); // Return 204 No Content on successful deletion
+    await matchService.deleteMatch(matchId);
+    const response = Result.success(null, 204);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    next(error); // Pass error to error handling middleware
+    next(error);
   }
 };

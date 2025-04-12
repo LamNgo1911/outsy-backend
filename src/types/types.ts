@@ -1,4 +1,4 @@
-import { MatchStatus, Status, Role } from "@prisma/client"; // ✅ Import Status properly
+import { MatchStatus, Status, Role, EventType, EventStatus } from "@prisma/client"; // ✅ Import Status properly
 import { EventLike, Event } from "./eventTypes"; // Import Event here
 
 // Base interfaces for common properties
@@ -129,9 +129,10 @@ export interface MatchInput {
   guestId: string;
 }
 
-export interface MatchUpdateInput {
-  status?: MatchStatus;
-  chatId?: string;
+export interface MatchFilters {
+  status?: MatchStatus,
+  eventType?: EventType,
+  eventStatus?: EventStatus
 }
 
 // Chat related types

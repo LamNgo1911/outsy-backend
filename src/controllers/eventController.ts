@@ -1,7 +1,6 @@
 import { EventStatus, EventType } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import eventService from "../services/eventService";
-import venueService from "../services/venueService";
 import { Result } from "../utils/Result";
 import { EventFilters, EventInput } from "../types/eventTypes";
 import { PaginationParams } from "../types/types";

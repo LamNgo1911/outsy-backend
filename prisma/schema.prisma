@@ -195,6 +195,7 @@ enum LikeStatus {
 }
 
 // Match model to store the matches between users and events
+// NOTE: Chat creation occurs during create Match
 model Match {
   id        String      @id @default(cuid())
   eventId   String
