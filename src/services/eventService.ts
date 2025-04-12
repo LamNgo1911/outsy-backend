@@ -96,7 +96,7 @@ const createEvent = async ({
   const eventDate = new Date(date)
   const now = new Date()
 
-  if (eventDate > now) {
+  if (eventDate < now) {
     throw new BadRequestError("The event date mustn't be in the past")
   }
 
@@ -133,7 +133,7 @@ const updateEvent = async (
   const eventDate = new Date(eventUpdateInput.date)
   const now = new Date()
 
-  if (eventDate > now) {
+  if (eventDate < now) {
     throw new BadRequestError("The event date mustn't be in the past")
   }
   
