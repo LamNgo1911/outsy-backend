@@ -3,7 +3,6 @@ import prisma from "../config/prisma";
 import { PaginationParams } from "../types/types";
 import { Venue, VenueFilters, VenueInput } from "../types/venueTypes";
 import { BadRequestError, NotFoundError } from "../error/apiError";
-import axios from "axios";
 
 const venueCache = new Map<string, { venue: Venue; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -24,9 +23,6 @@ const getCachedVenue = (venueId: string): Venue | null => {
 const cacheVenue = (venue: Venue) => {
   venueCache.set(venue.id, { venue, timestamp: Date.now() });
 };
-
-//Used for OpenStreetMap search location
-const openstreetmap_url = "https://nominatim.openstreetmap.org/search";
 
 const getAllVenues = async (
   filters: VenueFilters = {},
@@ -85,6 +81,8 @@ const getVenueById = async (venueId: string): Promise<Venue> => {
   return venue;
 };
 
+
+//NOTE - Temporary remove the venue reality verification
 const createVenue = async ({
   name,
   address,
@@ -109,25 +107,6 @@ const createVenue = async ({
     throw new BadRequestError("This venue address has already existed!");
   }
 
-  const venueRealityCheck = await axios.get(openstreetmap_url, {
-    params: {
-      q: `${address} ,${postalCode} ${city}, ${country}`,
-      format: "json",
-      addressdetails: 1,
-      limit: 1,
-    },
-    headers: {
-      // Nominatim requires identifying User-Agent
-      "User-Agent": `${process.env.APP_NAME} ${process.env.GITHUB_REPO}`,
-    },
-  });
-
-  if (!venueRealityCheck.data || venueRealityCheck.data.length === 0) {
-    throw new NotFoundError(
-      "This address can't be found or it doesn't exist on the map!"
-    );
-  }
-
   const newVenue = await prisma.venue.create({
     data: {
       name,
@@ -143,33 +122,13 @@ const createVenue = async ({
   return newVenue;
 };
 
+//NOTE - Temporary remove the venue reality verification
 const updateVenue = async (
   id: string,
   venueUpdateInput: VenueInput
 ): Promise<Venue> => {
   const venue = await prisma.venue.findUnique({ where: { id } });
   if (!venue) throw new NotFoundError("Venue not found");
-
-  const { address, postalCode, city, country } = venueUpdateInput;
-
-  const venueRealityCheck = await axios.get(openstreetmap_url, {
-    params: {
-      q: `${address} ,${postalCode} ${city}, ${country}`,
-      format: "json",
-      addressdetails: 1,
-      limit: 1,
-    },
-    headers: {
-      // Nominatim requires identifying User-Agent
-      "User-Agent": `${process.env.APP_NAME} ${process.env.GITHUB_REPO}`,
-    },
-  });
-
-  if (!venueRealityCheck.data || venueRealityCheck.data.length === 0) {
-    throw new NotFoundError(
-      "This address can't be found or it doesn't exist on the map!"
-    );
-  }
 
   const newUpdatedVenue = await prisma.venue.update({
     where: { id },
