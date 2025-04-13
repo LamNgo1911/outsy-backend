@@ -1,9 +1,8 @@
 import { EventStatus, EventType } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import eventService from "../services/eventService";
-import venueService from "../services/venueService";
 import { Result } from "../utils/Result";
-import { EventFilters, EventInput } from "../types/eventTypes";
+import { EventFilters, EventInput, EventUpdateInput } from "../types/eventTypes";
 import { PaginationParams } from "../types/types";
 
 export const getEvents = async (
@@ -12,7 +11,7 @@ export const getEvents = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { type, status, dateRange, venueId, hostId, page, limit } = req.query;
+    const { type, status, dateRange, venueId, page, limit } = req.query;
 
     const filters: EventFilters = {
       ...(type && { type: type as EventType }),
@@ -23,8 +22,7 @@ export const getEvents = async (
           end: new Date((dateRange as string).split(",")[1]),
         },
       }),
-      ...(venueId && { venueId: venueId as string }),
-      ...(hostId && { hostId: hostId as string }),
+      ...(venueId && { venueId: venueId as string })
     };
 
     const pagination: PaginationParams = {
@@ -85,7 +83,7 @@ export const updateEvent = async (
 ): Promise<void> => {
   try {
     const { eventId } = req.params;
-    const requestedData: EventInput = req.body;
+    const requestedData: EventUpdateInput = req.body;
 
     const updatedEvent = await eventService.updateEvent(eventId, requestedData);
     const response = Result.success(updatedEvent);

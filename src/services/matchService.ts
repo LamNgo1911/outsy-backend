@@ -1,13 +1,24 @@
 import prisma from "../config/prisma";
-import { Match, MatchInput, MatchUpdateInput } from "../types/types";
+import { Match, MatchFilters, MatchInput } from "../types/types";
 import { NotFoundError, BadRequestError } from "../error/apiError";
-import { MatchStatus } from "@prisma/client";
+import { MatchStatus, Prisma } from "@prisma/client";
+
+const stripUserPassword = (user: any) => {
+  if (!user) return null;
+  const { password, ...rest } = user;
+  return rest;
+};
+
+const sanitizeMatch = (match: any) => ({
+  ...match,
+  host: stripUserPassword(match.host),
+  guest: stripUserPassword(match.guest),
+});
 
 // Create a new match
 const createMatch = async (input: MatchInput): Promise<Match> => {
   const { eventId, guestId } = input;
 
-  // Check if event exists
   const event = await prisma.event.findUnique({
     where: { id: eventId },
   });
@@ -16,7 +27,6 @@ const createMatch = async (input: MatchInput): Promise<Match> => {
     throw new NotFoundError("Event not found");
   }
 
-  // Check if guest exists
   const guest = await prisma.user.findUnique({
     where: { id: guestId },
   });
@@ -43,6 +53,8 @@ const createMatch = async (input: MatchInput): Promise<Match> => {
       hostId: event.hostId,
       guestId,
       status: MatchStatus.CONFIRMED,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     include: {
       event: true,
@@ -59,7 +71,7 @@ const createMatch = async (input: MatchInput): Promise<Match> => {
     },
   });
 
-  return match;
+  return sanitizeMatch(match);
 };
 
 // Get match by ID
@@ -85,60 +97,112 @@ const getMatchById = async (id: string): Promise<Match> => {
     throw new NotFoundError("Match not found");
   }
 
-  return match;
+  return sanitizeMatch(match);
 };
 
 // Get matches by event ID
-const getMatchesByEventId = async (eventId: string): Promise<Match[]> => {
-  const matches = await prisma.match.findMany({
-    where: { eventId },
-    include: {
-      event: true,
-      host: {
-        include: {
-          preferences: true,
-        },
-      },
-      guest: {
-        include: {
-          preferences: true,
-        },
-      },
-    },
-  });
+const getMatchesByEventId = async (
+  eventId: string,
+  filters: MatchFilters = {},
+  pagination: { page?: number; limit?: number }
+): Promise<{ allMatches: Match[]; total: number }> => {
+  const {
+    status,
+    eventType,
+    eventStatus = "OPEN",
+  } = filters;
+  const { page = 1, limit = 10 } = pagination;
+  const skip = (page - 1) * limit;
 
-  return matches;
+  const where: Prisma.MatchWhereInput = {
+    ...(status && { status }),
+    event: {
+      ...(eventType && { type: eventType }),
+      ...(eventStatus && { status: eventStatus }),
+    },
+  };
+
+  const [matches, total] = await Promise.all([
+    prisma.match.findMany({
+      where: { eventId },
+      skip,
+      take: limit,
+      include: {
+        event: true,
+        host: {
+          include: {
+            preferences: true,
+          },
+        },
+        guest: {
+          include: {
+            preferences: true,
+          },
+        },
+      },
+    }),
+    prisma.match.count({ where }),
+  ]);
+
+  return {
+    allMatches: matches.map(sanitizeMatch),
+    total,
+  };
 };
 
 // Get matches by user ID
-const getMatchesByUserId = async (userId: string): Promise<Match[]> => {
-  const matches = await prisma.match.findMany({
-    where: {
-      OR: [{ hostId: userId }, { guestId: userId }],
-    },
-    include: {
-      event: true,
-      host: {
-        include: {
-          preferences: true,
-        },
-      },
-      guest: {
-        include: {
-          preferences: true,
-        },
-      },
-    },
-  });
+const getMatchesByUserId = async (
+  userId: string,
+  filters: MatchFilters = {},
+  pagination: { page?: number; limit?: number }
+): Promise<{ allMatches: Match[]; total: number }> => {
+  const {
+    status,
+    eventType,
+    eventStatus = "OPEN",
+  } = filters;
+  const { page = 1, limit = 10 } = pagination;
+  const skip = (page - 1) * limit;
 
-  return matches;
+  const where: Prisma.MatchWhereInput = {
+    ...(status && { status }),
+    event: {
+      ...(eventType && { type: eventType }),
+      ...(eventStatus && { status: eventStatus }),
+    },
+  };
+
+  const [matches, total] = await Promise.all([
+    prisma.match.findMany({
+      where: {
+        OR: [{ hostId: userId }, { guestId: userId }],
+      },
+      skip,
+      include: {
+        event: true,
+        host: {
+          include: {
+            preferences: true,
+          },
+        },
+        guest: {
+          include: {
+            preferences: true,
+          },
+        },
+      },
+    }),
+    prisma.match.count({ where }),
+  ]);
+
+  return {
+    allMatches: matches.map(sanitizeMatch),
+    total,
+  };
 };
 
 // Update match status
-const updateMatch = async (
-  id: string,
-  input: MatchUpdateInput
-): Promise<Match> => {
+const updateMatch = async (id: string, status: MatchStatus): Promise<Match> => {
   const match = await prisma.match.findUnique({
     where: { id },
   });
@@ -150,7 +214,7 @@ const updateMatch = async (
   const updatedMatch = await prisma.match.update({
     where: { id },
     data: {
-      ...input,
+      status,
       updatedAt: new Date(),
     },
     include: {
@@ -168,7 +232,7 @@ const updateMatch = async (
     },
   });
 
-  return updatedMatch;
+  return sanitizeMatch(updatedMatch);
 };
 
 // Delete match
