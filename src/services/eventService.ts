@@ -1,6 +1,11 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
-import { EventFilters, Event, EventInput } from "../types/eventTypes";
+import {
+  EventFilters,
+  Event,
+  EventInput,
+  EventUpdateInput,
+} from "../types/eventTypes";
 import { PaginationParams } from "../types/types";
 import { BadRequestError, NotFoundError } from "../error/apiError";
 
@@ -28,12 +33,7 @@ const getEvents = async (
   filters: EventFilters = {},
   pagination: PaginationParams = {}
 ): Promise<{ events: Event[]; total: number }> => {
-  const {
-    type = "FOOD",
-    status = "OPEN",
-    venueId,
-    dateRange,
-  } = filters;
+  const { type, status, venueId, dateRange } = filters;
   const { page = 1, limit = 10 } = pagination;
   const skip = (page - 1) * limit;
 
@@ -42,8 +42,8 @@ const getEvents = async (
     status,
     ...(dateRange && {
       date: {
-        lte: new Date(dateRange.start),
-        gte: new Date(dateRange.end),
+        gte: new Date(dateRange.start),
+        lte: new Date(dateRange.end),
       },
     }),
     ...(venueId && { venueId }),
@@ -54,7 +54,7 @@ const getEvents = async (
       where,
       skip,
       take: limit,
-      orderBy: { date: "asc" }
+      orderBy: { date: "asc" },
     }),
     prisma.event.count({ where }),
   ]);
@@ -63,16 +63,16 @@ const getEvents = async (
 };
 
 const getEventById = async (eventId: string): Promise<Event> => {
-  const cachedEvent = getCachedEvent(eventId)
-  if (cachedEvent) return cachedEvent
+  const cachedEvent = getCachedEvent(eventId);
+  if (cachedEvent) return cachedEvent;
 
   const event = await prisma.event.findUnique({ where: { id: eventId } });
 
   if (!event) {
     throw new NotFoundError(`User ID ${eventId} not found.`);
   }
-  
-  cacheEvent(event)
+
+  cacheEvent(event);
   return event;
 };
 
@@ -85,19 +85,19 @@ const createEvent = async ({
 }: EventInput): Promise<Event> => {
   const venueExists = await prisma.venue.findUnique({
     where: {
-      id: venueId
-    }
-  })
+      id: venueId,
+    },
+  });
 
   if (!venueExists) {
-    throw new NotFoundError("No venue found with the provided Venue ID")
+    throw new NotFoundError("No venue found with the provided Venue ID");
   }
 
-  const eventDate = new Date(date)
-  const now = new Date()
+  const eventDate = new Date(date);
+  const now = new Date();
 
   if (eventDate < now) {
-    throw new BadRequestError("The event date mustn't be in the past")
+    throw new BadRequestError("The event date mustn't be in the past");
   }
 
   const newEvent = await prisma.event.create({
@@ -118,25 +118,29 @@ const createEvent = async ({
 
 const updateEvent = async (
   id: string,
-  eventUpdateInput: EventInput
+  eventUpdateInput: EventUpdateInput
 ): Promise<Event> => {
-  const venueExists = await prisma.venue.findUnique({
-    where: {
-      id: eventUpdateInput.venueId
+  if (eventUpdateInput.venueId) {
+    const venueExists = await prisma.venue.findUnique({
+      where: {
+        id: eventUpdateInput.venueId,
+      },
+    });
+
+    if (!venueExists) {
+      throw new NotFoundError("No venue found with the provided Venue ID");
     }
-  })
-
-  if (!venueExists) {
-    throw new NotFoundError("No venue found with the provided Venue ID")
   }
 
-  const eventDate = new Date(eventUpdateInput.date)
-  const now = new Date()
+  if (eventUpdateInput.date) {
+    const eventDate = new Date(eventUpdateInput.date);
+    const now = new Date();
 
-  if (eventDate < now) {
-    throw new BadRequestError("The event date mustn't be in the past")
+    if (eventDate < now) {
+      throw new BadRequestError("The event date mustn't be in the past");
+    }
   }
-  
+
   const newUpdatedEvent = await prisma.event.update({
     where: { id },
     data: { ...eventUpdateInput, updatedAt: new Date() },

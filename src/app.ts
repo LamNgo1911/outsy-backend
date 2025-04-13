@@ -16,7 +16,7 @@ import eventLikeRouter from "./routes/eventLikeRoutes";
 import apiErrorhandler from "./middlewares/apiErrorHandler";
 import notFoundError from "./middlewares/notFoundError";
 import authRouter from "./routes/authRoutes";
-// import expenseRouter from './routes/expenseRoutes';
+import matchRouter from "./routes/matchRoutes"
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -42,7 +42,7 @@ app.use("/api/v1/feedbacks", feedbackRouter);
 app.use("/api/v1/userchats", userchatRouter);
 app.use("/api/v1/venues", venueRouter);
 app.use("/api/v1/eventlikes", eventLikeRouter);
-// app.use('/expenses', expenseRouter); // https://localhost:8000/expenses
+app.use("/api/v1/matches", matchRouter);
 
 /* ERROR HANDLING */
 app.use(notFoundError);
