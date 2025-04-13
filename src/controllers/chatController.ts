@@ -1,58 +1,106 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import chatService from '../services/chatService';
+import { Result } from '../utils/Result';
+import { PaginationParams } from '../types/types';
+import { ChatFilters, ChatInput } from '../types/chatTypes';
 
-// Create a new chat
-export const createChat = async (req: Request, res: Response) => {
+export const getChats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { isActive, dateRange, page, limit, sortBy, sortOrder } = req.query;
+    const dateRangeArray = dateRange ? (dateRange as string).split(',') : [];
+
+    const filters: ChatFilters = {
+      ...(isActive !== undefined && {
+        isActive: isActive === 'true' ? true : false,
+      }),
+      ...(dateRange && {
+        dateRange: {
+          start: new Date(dateRangeArray[0]),
+          end: new Date(dateRangeArray[1]),
+        },
+      }),
+    };
+
+    const pagination: PaginationParams = {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+      sortBy: sortBy as string | undefined,
+      sortOrder: sortOrder as 'asc' | 'desc' | undefined,
+    };
+
+    const result = await chatService.getChats(filters, pagination);
+    const response = Result.success(result);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getChatById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const chat = await chatService.getChatById(id);
+    const response = Result.success(chat);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createChat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const chat = await chatService.createChat();
-    res.status(201).json(chat);
+    const response = Result.success(chat, 201);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create chat' });
+    next(error);
   }
 };
 
-// Update a chat
-export const updateChat = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const updateData = req.body;
-
+export const updateChat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
+    const { id } = req.params;
+    const updateData: ChatInput = req.body;
     const chat = await chatService.updateChat(id, updateData);
-    res.json(chat);
+    const response = Result.success(chat);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    console.error('Error updating chat:', error);
-    res.status(500).json({ error: 'Failed to update chat' });
+    next(error);
   }
 };
 
-// Delete a chat
-export const deleteChat = async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const deleteChat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const chat = await chatService.deleteChat(id);
-    res.status(204).json(chat);
+    const { id } = req.params;
+    await chatService.deleteChat(id);
+    const response = Result.success(null, 204);
+    const { statusCode, body } = response.toResponse();
+    res.status(statusCode).json(body);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete chat' });
-  }
-};
-
-// Get all chats
-export const getAllChats = async (req: Request, res: Response) => {
-  try {
-    const chats = await chatService.getAllChats();
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch chats' });
-  }
-};
-
-// Get a specific chat
-export const getChatById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  try {
-    const chat = await chatService.getChatById(id);
-    res.json(chat);
-  } catch (error) {
-    res.status(404).json({ error: 'Failed to fetch chat' });
+    next(error);
   }
 };
