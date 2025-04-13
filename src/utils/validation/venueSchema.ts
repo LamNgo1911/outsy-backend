@@ -8,7 +8,7 @@ export const venueSchema = z.object({
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
   description: z.string().nullable(),
-  imageUrl: z.string().url("Image URL must be valid").nullable(),
+  imageUrl: z.string().nullable(),
 });
 
 export const createVenueSchema = z.object({
