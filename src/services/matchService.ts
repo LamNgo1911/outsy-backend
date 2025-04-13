@@ -3,6 +3,18 @@ import { Match, MatchFilters, MatchInput } from "../types/types";
 import { NotFoundError, BadRequestError } from "../error/apiError";
 import { MatchStatus, Prisma } from "@prisma/client";
 
+const stripUserPassword = (user: any) => {
+  if (!user) return null;
+  const { password, ...rest } = user;
+  return rest;
+};
+
+const sanitizeMatch = (match: any) => ({
+  ...match,
+  host: stripUserPassword(match.host),
+  guest: stripUserPassword(match.guest),
+});
+
 // Create a new match
 const createMatch = async (input: MatchInput): Promise<Match> => {
   const { eventId, guestId } = input;
@@ -59,7 +71,7 @@ const createMatch = async (input: MatchInput): Promise<Match> => {
     },
   });
 
-  return match;
+  return sanitizeMatch(match);
 };
 
 // Get match by ID
@@ -85,7 +97,7 @@ const getMatchById = async (id: string): Promise<Match> => {
     throw new NotFoundError("Match not found");
   }
 
-  return match;
+  return sanitizeMatch(match);
 };
 
 // Get matches by event ID
@@ -95,8 +107,8 @@ const getMatchesByEventId = async (
   pagination: { page?: number; limit?: number }
 ): Promise<{ allMatches: Match[]; total: number }> => {
   const {
-    status = "CONFIRMED",
-    eventType = "FOOD",
+    status,
+    eventType,
     eventStatus = "OPEN",
   } = filters;
   const { page = 1, limit = 10 } = pagination;
@@ -132,7 +144,10 @@ const getMatchesByEventId = async (
     prisma.match.count({ where }),
   ]);
 
-  return { allMatches: matches, total };
+  return {
+    allMatches: matches.map(sanitizeMatch),
+    total,
+  };
 };
 
 // Get matches by user ID
@@ -142,8 +157,8 @@ const getMatchesByUserId = async (
   pagination: { page?: number; limit?: number }
 ): Promise<{ allMatches: Match[]; total: number }> => {
   const {
-    status = "CONFIRMED",
-    eventType = "FOOD",
+    status,
+    eventType,
     eventStatus = "OPEN",
   } = filters;
   const { page = 1, limit = 10 } = pagination;
@@ -162,6 +177,7 @@ const getMatchesByUserId = async (
       where: {
         OR: [{ hostId: userId }, { guestId: userId }],
       },
+      skip,
       include: {
         event: true,
         host: {
@@ -179,7 +195,10 @@ const getMatchesByUserId = async (
     prisma.match.count({ where }),
   ]);
 
-  return { allMatches: matches, total };
+  return {
+    allMatches: matches.map(sanitizeMatch),
+    total,
+  };
 };
 
 // Update match status
@@ -213,7 +232,7 @@ const updateMatch = async (id: string, status: MatchStatus): Promise<Match> => {
     },
   });
 
-  return updatedMatch;
+  return sanitizeMatch(updatedMatch);
 };
 
 // Delete match

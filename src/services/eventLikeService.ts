@@ -5,7 +5,11 @@ import {
   EventLikeFilters,
   EventLikeInput,
 } from "../types/eventTypes";
-import { ForbiddenError, NotFoundError } from "../error/apiError";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../error/apiError";
 
 //NOTE - The user caching should be utilized in this case, instead of
 //searching for new user everytime
@@ -14,13 +18,7 @@ const getAllLikedEvent = async (
   filters: EventLikeFilters = {},
   pagination: { page?: number; limit?: number }
 ): Promise<{ allLikedEvents: EventLike[]; total: number }> => {
-  const {
-    type = "FOOD",
-    status = "OPEN",
-    venueId,
-    dateRange,
-    likeStatus = "ACCEPTED",
-  } = filters;
+  const { type, status = "OPEN", venueId, dateRange, likeStatus } = filters;
   const { page = 1, limit = 10 } = pagination;
   const skip = (page - 1) * limit;
 
@@ -33,15 +31,16 @@ const getAllLikedEvent = async (
   }
 
   const where: Prisma.EventLikeWhereInput = {
-    ...(likeStatus && { likeStatus }),
+    userId,
+    ...(likeStatus && { status: likeStatus }),
     event: {
       status,
       type,
       ...(venueId && { venueId }),
       ...(dateRange && {
         date: {
-          lte: new Date(dateRange.start),
-          gte: new Date(dateRange.end),
+          gte: new Date(dateRange.start),
+          lte: new Date(dateRange.end),
         },
       }),
     },
@@ -49,7 +48,7 @@ const getAllLikedEvent = async (
 
   const [allLikedEvents, total] = await Promise.all([
     prisma.eventLike.findMany({
-      where: { userId },
+      where,
       skip,
       take: limit,
       orderBy: {
@@ -78,6 +77,19 @@ const getSpecificLikedEvent = async (id: string): Promise<EventLike> => {
 const createLikeEvent = async (
   requestedEventLike: EventLikeInput
 ): Promise<EventLike> => {
+  const findEvent = await prisma.event.findUnique({
+    where: { id: requestedEventLike.eventId },
+  });
+
+  if (!findEvent) {
+    throw new NotFoundError(
+      "Event you are looking for is not found or has been deleted!"
+    );
+  }
+  if (findEvent.hostId === requestedEventLike.userId) {
+    throw new BadRequestError("An event host can't like themselves event!");
+  }
+
   const newLikedEvent = await prisma.eventLike.create({
     data: {
       ...requestedEventLike,
@@ -95,7 +107,7 @@ const updateLikedEventStatus = async (
   status: LikeStatus
 ): Promise<EventLike> => {
   const eventLike = await prisma.eventLike.findUnique({ where: { id } });
-  
+
   if (!eventLike) {
     throw new NotFoundError("Event like not found or has been deleted!");
   }
@@ -113,11 +125,11 @@ const updateLikedEventStatus = async (
 
 const deleteLikedEvent = async (id: string): Promise<void> => {
   const eventLike = await prisma.eventLike.findUnique({ where: { id } });
-  
+
   if (!eventLike) {
     throw new NotFoundError("Event like not found or has been deleted!");
   }
-  
+
   await prisma.eventLike.delete({ where: { id } });
 };
 
