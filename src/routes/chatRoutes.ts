@@ -2,51 +2,19 @@ import { Router } from 'express';
 import {
   createChat,
   deleteChat,
-  getAllChats,
   getChatById,
+  getChats,
   updateChat,
 } from '../controllers/chatController';
-import { validateRequest } from '../middlewares/validateRequest';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { z } from 'zod';
+import { validateRequest } from '../middlewares/validateRequest';
+import {
+  chatIdSchema,
+  chatQuerySchema,
+  chatUpdateSchema,
+} from '../utils/validation/chatSchema';
 
 const router = Router();
-
-// Validation schemas
-const chatIdSchema = z.object({
-  params: z.object({
-    id: z.string().min(1, 'Chat ID is required'),
-  }),
-});
-
-const chatUpdateSchema = z.object({
-  params: z.object({
-    id: z.string().min(1, 'Chat ID is required'),
-  }),
-  body: z.object({
-    isActive: z.boolean().optional(),
-  }),
-});
-
-// Pagination and filtering schema for GET routes
-const chatQuerySchema = z.object({
-  query: z.object({
-    page: z
-      .string()
-      .optional()
-      .transform((val) => (val ? parseInt(val) : 1)),
-    limit: z
-      .string()
-      .optional()
-      .transform((val) => (val ? parseInt(val) : 10)),
-    sortBy: z.enum(['createdAt', 'isActive']).optional(),
-    sortOrder: z.enum(['asc', 'desc']).optional(),
-    isActive: z
-      .string()
-      .optional()
-      .transform((val) => val === 'true'),
-  }),
-});
 
 // Apply authentication middleware to all routes
 router.use(authMiddleware);
@@ -55,7 +23,7 @@ router.use(authMiddleware);
 router.post('/', createChat);
 
 // Get all chats with pagination and filtering
-router.get('/', validateRequest(chatQuerySchema), getAllChats);
+router.get('/', validateRequest(chatQuerySchema), getChats);
 
 // Get chat by ID
 router.get('/:id', validateRequest(chatIdSchema), getChatById);
