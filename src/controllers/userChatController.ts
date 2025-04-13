@@ -29,8 +29,8 @@ export const removeUserFromChat = async (
 ) => {
   try {
     const input: UserChatInput = {
-      userId: req.params.userId,
-      chatId: req.params.chatId,
+      userId: req.body.userId,
+      chatId: req.body.chatId,
     };
     await userChatService.removeUserFromChat(input);
     res.status(200).json(Result.success(null));

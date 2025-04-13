@@ -29,7 +29,7 @@ const markMessagesAsRead = async (
   userId: string
 ): Promise<void> => {
   await prisma.message.updateMany({
-    // isRead will be set to true only for messages sent by other users
+    // isRead will be set to true only for all messages sent by other users
     where: { chatId, senderId: { not: userId }, isRead: false },
     data: { isRead: true },
   });

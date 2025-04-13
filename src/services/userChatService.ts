@@ -79,13 +79,11 @@ const getUsersByChatId = async (
   filters: UserChatFilters = {},
   pagination: PaginationParams = {}
 ): Promise<UserChatResponse> => {
+  const { dateRange } = filters;
   const {
     page = 1,
     limit = 10,
-    sortBy = 'createdAt',
-    sortOrder = 'desc',
   } = pagination;
-  const { dateRange } = filters;
 
   const skip = (page - 1) * limit;
 
@@ -104,10 +102,9 @@ const getUsersByChatId = async (
       where,
       skip,
       take: limit,
-      orderBy: {
-        [sortBy]: sortOrder,
+      include: {
+        user: true,
       },
-      include: { user: true },
     }),
     prisma.userChat.count({ where }),
   ]);
@@ -124,13 +121,11 @@ const getChatsByUserId = async (
   filters: UserChatFilters = {},
   pagination: PaginationParams = {}
 ): Promise<UserChatResponse> => {
+  const { dateRange } = filters;
   const {
     page = 1,
     limit = 10,
-    sortBy = 'createdAt',
-    sortOrder = 'desc',
   } = pagination;
-  const { dateRange } = filters;
 
   const skip = (page - 1) * limit;
 
@@ -149,10 +144,9 @@ const getChatsByUserId = async (
       where,
       skip,
       take: limit,
-      orderBy: {
-        [sortBy]: sortOrder,
+      include: {
+        chat: true,
       },
-      include: { chat: true },
     }),
     prisma.userChat.count({ where }),
   ]);
