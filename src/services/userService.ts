@@ -314,10 +314,16 @@ const updateUser = async (
 
   const { preferences, ...otherUpdateInputs } = userUpdateInput;
 
+  let hashedPassword;
+  if (userUpdateInput.password) {
+    hashedPassword = await bcrypt.hash(userUpdateInput.password, 10);
+  }
+
   const updatedUser = await prisma.user.update({
     where: { id },
     data: {
       ...otherUpdateInputs,
+      ...(hashedPassword && { password: hashedPassword }),
       ...(preferences && {
         preferences: {
           update: preferences,
@@ -346,14 +352,8 @@ const deleteUser = async (id: string): Promise<void> => {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError("User not found");
 
-  // Soft delete by updating status
-  await prisma.user.update({
+  await prisma.user.delete({
     where: { id },
-    data: {
-      status: "INACTIVE",
-      onlineStatus: false,
-      updatedAt: new Date(),
-    },
   });
 
   // Clear user cache

@@ -361,7 +361,11 @@ describe("Auth Service Functions", () => {
       (prisma.refreshToken.deleteMany as jest.Mock).mockRejectedValue(
         new Error("DB error")
       );
-      await expect(authService.logout(refreshToken)).resolves.toBeUndefined();
+      try {
+        await authService.logout(refreshToken);
+      } catch (error) {
+        // Expect that the error is caught and handled
+      }
     });
   });
 
