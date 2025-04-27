@@ -46,7 +46,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       password
     );
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: {
         user,
@@ -69,7 +69,7 @@ const refreshToken = async (
     const { accessToken, newRefreshToken } =
       await authService.refreshAccessToken(refreshToken);
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: {
         accessToken,
@@ -86,10 +86,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.body as RefreshTokenRequest;
     await authService.logout(refreshToken);
 
-    res.json({
-      success: true,
-      message: "Successfully logged out",
-    });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
