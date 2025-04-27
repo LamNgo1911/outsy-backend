@@ -107,6 +107,7 @@ export interface UserUpdateInput {
   onlineStatus?: boolean;
   igUrl?: string | null;
   preferences?: PreferenceInput;
+  updatedAt?: Date;
 }
 
 // Match related types

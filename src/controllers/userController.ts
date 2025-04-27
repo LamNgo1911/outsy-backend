@@ -182,8 +182,8 @@ export const deleteUser = async (
     const { id } = req.params;
     await userService.deleteUser(id);
     const response = Result.success(null, 204);
-    const { statusCode, body } = response.toResponse();
-    res.status(statusCode).json(body);
+    const { statusCode } = response.toResponse();
+    res.status(statusCode).send();
   } catch (error) {
     next(error); // Propagate error to middleware
   }
