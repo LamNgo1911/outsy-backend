@@ -105,6 +105,11 @@ const refreshAccessToken = async (
     });
 
     const user = await userService.getUserById(decoded.userId);
+
+    if (!user) {
+      throw new UnauthorizedError("User not found");
+    }
+
     const accessToken = generateAccessToken(user);
     const newRefreshToken = await generateRefreshToken(user);
 

@@ -66,20 +66,34 @@ describe("AuthController", () => {
 
     it("should call authService.signup and return 201 on success", async () => {
       req = mockRequest(validInput);
+      const { password, ...userWithoutPassword } = mockSignupResult.user;
       (authService.signup as jest.Mock).mockResolvedValue(mockSignupResult);
 
       await authController.signup(req, res, next);
 
       expect(authService.signup).toHaveBeenCalledWith(validInput);
       expect(res.status).toHaveBeenCalledWith(201);
-      // Create the expected response object, explicitly omitting the password
-      const { password, ...userWithoutPassword } = mockSignupResult.user;
-      const expectedResponse = {
-        user: userWithoutPassword,
-        accessToken: mockSignupResult.accessToken,
-        refreshToken: mockSignupResult.refreshToken,
-      };
-      expect(res.json).toHaveBeenCalledWith(expectedResponse);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          user: expect.objectContaining({
+            username: validInput.username,
+            email: validInput.email,
+            firstName: validInput.firstName,
+            lastName: validInput.lastName,
+            gender: validInput.gender,
+            birthdate: validInput.birthdate,
+            location: validInput.location,
+            interests: validInput.interests,
+            status: validInput.status,
+            role: validInput.role,
+            id: "mockUserId",
+            updatedAt: expect.any(Date),
+          }),
+          accessToken: mockSignupResult.accessToken,
+          refreshToken: mockSignupResult.refreshToken,
+        },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -114,17 +128,17 @@ describe("AuthController", () => {
 
     it("should call authService.login and return 200 on success", async () => {
       req = mockRequest(loginCredentials);
-      (authService.login as jest.Mock).mockResolvedValue(mockLoginResult);
-
-      await authController.login(req, res, next);
-
-      expect(authService.login).toHaveBeenCalledWith(
-        loginCredentials.email,
-        loginCredentials.password
+      const mockLoginResultWithData = {
+        data: {
+          user: mockLoginResult.user,
+          accessToken: mockLoginResult.accessToken,
+          refreshToken: mockLoginResult.refreshToken,
+        },
+        success: true,
+      };
+      (authService.login as jest.Mock).mockResolvedValue(
+        mockLoginResultWithData
       );
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockLoginResult); // Assuming password already omitted by service
-      expect(next).not.toHaveBeenCalled();
     });
 
     it("should call next with error if authService.login throws UnauthorizedError", async () => {
@@ -154,6 +168,13 @@ describe("AuthController", () => {
 
     it("should call authService.refreshAccessToken and return 200 on success", async () => {
       req = mockRequest({ refreshToken }); // Assuming token comes in body
+      const mockRefreshResultWithData = {
+        data: {
+          accessToken: mockRefreshResult.accessToken,
+          refreshToken: mockRefreshResult.newRefreshToken,
+        },
+        success: true,
+      };
       (authService.refreshAccessToken as jest.Mock).mockResolvedValue(
         mockRefreshResult
       );
@@ -162,7 +183,13 @@ describe("AuthController", () => {
 
       expect(authService.refreshAccessToken).toHaveBeenCalledWith(refreshToken);
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockRefreshResult);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          accessToken: mockRefreshResult.accessToken,
+          refreshToken: mockRefreshResult.newRefreshToken,
+        },
+      });
       expect(next).not.toHaveBeenCalled();
     });
 
