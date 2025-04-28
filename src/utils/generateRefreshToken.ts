@@ -13,7 +13,7 @@ const generateRefreshToken = async (user: User): Promise<string> => {
 
   const rawToken = jwt.sign({ userId: user.id }, secret, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRATION || "30d",
-  } as jwt.SignOptions);
+  } as jwt.SignOptions); 
 
   const hashedToken = await bcrypt.hash(rawToken, 10);
   const expiresAt = new Date();
