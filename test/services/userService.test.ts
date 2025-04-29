@@ -1,9 +1,9 @@
-import userService from "../../src/services/userService";
-import prisma from "../../src/config/prisma";
+import { Role, Status } from "@prisma/client"; // Import enums
 import bcrypt from "bcrypt";
+import prisma from "../../src/config/prisma";
+import { NotFoundError } from "../../src/error/apiError";
+import userService from "../../src/services/userService";
 import { UserInput, UserUpdateInput } from "../../src/types/types";
-import { NotFoundError, BadRequestError } from "../../src/error/apiError";
-import { Status, Role } from "@prisma/client"; // Import enums
 
 // Mock dependencies
 jest.mock("../../src/config/prisma", () => {

@@ -127,11 +127,11 @@ model Message {
 
 // Feedback model to store the feedback given by users
 model Feedback {
-  id        String   @id @default(cuid())
-  userId    String
-  giverId   String
-  text      String
-  createdAt DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  giverId        String
+  text           String
+  lastModifiedAt DateTime @default(now()) @updatedAt
 
   user  User @relation("FeedbackRecipient", fields: [userId], references: [id])
   giver User @relation("FeedbackGiver", fields: [giverId], references: [id])
