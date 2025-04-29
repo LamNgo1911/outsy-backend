@@ -1,8 +1,5 @@
-import messageService from '../../src/services/messageService';
 import prisma from '../../src/config/prisma';
-import { Message } from '@prisma/client';
-import { MessageResponse } from '../../src/types/messageTypes';
-import { BadRequestError } from '../../src/error/apiError';
+import messageService from '../../src/services/messageService';
 
 // Mock dependencies
 jest.mock('../../src/config/prisma', () => ({

@@ -1,9 +1,7 @@
 import prisma from '../../src/config/prisma';
-import { BadRequestError, NotFoundError } from '../../src/error/apiError';
 import chatService from '../../src/services/chatService';
 import { ChatFilters, ChatInput } from '../../src/types/chatTypes';
 import { PaginationParams } from '../../src/types/types';
-import { Chat } from '@prisma/client';
 
 // Mock dependencies
 jest.mock('../../src/config/prisma', () => ({

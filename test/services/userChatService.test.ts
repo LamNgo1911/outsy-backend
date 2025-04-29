@@ -1,13 +1,10 @@
-import userChatService from '../../src/services/userChatService';
 import prisma from '../../src/config/prisma';
-import { UserChat } from '@prisma/client';
-import {
-  UserChatInput,
-  UserChatFilters,
-  UserChatResponse,
-} from '../../src/types/userChatTypes';
+import userChatService from '../../src/services/userChatService';
 import { PaginationParams } from '../../src/types/types';
-import { BadRequestError, NotFoundError } from '../../src/error/apiError';
+import {
+  UserChatFilters,
+  UserChatInput
+} from '../../src/types/userChatTypes';
 
 // Mock dependencies
 jest.mock('../../src/config/prisma', () => ({

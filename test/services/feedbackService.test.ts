@@ -1,12 +1,9 @@
-import feedbackService from '../../src/services/feedbackService';
 import prisma from '../../src/config/prisma';
-import { Feedback } from '@prisma/client';
+import feedbackService from '../../src/services/feedbackService';
 import {
-  FeedbackFilters,
-  FeedbackResponse,
+  FeedbackFilters
 } from '../../src/types/feedbackTypes';
 import { PaginationParams } from '../../src/types/types';
-import { NotFoundError, BadRequestError } from '../../src/error/apiError';
 
 // Mock dependencies
 jest.mock('../../src/config/prisma', () => ({
