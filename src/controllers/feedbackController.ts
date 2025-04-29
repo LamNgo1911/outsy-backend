@@ -141,3 +141,11 @@ export const updateFeedback = async (
     next(error);
   }
 };
+
+export default {
+  createFeedback,
+  getFeedbackReceived,
+  getFeedbackGiven,
+  deleteFeedback,
+  updateFeedback,
+};

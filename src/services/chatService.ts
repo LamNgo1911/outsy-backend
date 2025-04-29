@@ -39,14 +39,14 @@ const getChats = async (
   pagination: PaginationParams = {}
 ): Promise<ChatResponse> => {
   const { isActive, dateRange } = filters;
-  
+
   const {
     page = 1,
     limit = 10,
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = pagination;
-  
+
   const skip = (page - 1) * limit;
 
   const where = {
