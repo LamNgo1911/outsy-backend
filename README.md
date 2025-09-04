@@ -1,136 +1,126 @@
-# Outsy Backend
+Outsy Backend
+
+The Outsy backend is a REST API built with Node.js, TypeScript, and Express, providing the core logic and data management for the Outsy application. It handles user authentication, event management, chat functionality, feedback collection, user matching, and venue management. The backend uses Prisma ORM to interact with a PostgreSQL database, and supports Docker deployment and CI/CD to AWS EC2.
+
+## Features
+
+- User authentication with JWT (access & refresh tokens)
+- Prisma ORM for PostgreSQL database
+- Event, Match, Chat, and Feedback management
+- Dockerized for easy deployment
+- CI/CD-ready GitHub Actions workflow
 
 ## Table of Contents
 
--   [Description](#description)
--   [Technologies Used](#technologies-used)
--   [Project Structure](#project-structure)
--   [Database Schema](#database-schema)
--   [API Endpoints](#api-endpoints)
-    -   [Authentication Routes](#authentication-routes-authroutes)
-    -   [Chat Routes](#chat-routes-chatroutes)
-    -   [EventLike Routes](#eventlike-routes-eventlikeroutes)
-    -   [Event Routes](#event-routes-eventroutes)
-    -   [Feedback Routes](#feedback-routes-feedbackroutes)
-    -   [Match Routes](#match-routes-matchroutes)
-    -   [Message Routes](#message-routes-messageroutes)
-    -   [UserChat Routes](#userchat-routes-userchatroutes)
-    -   [User Routes](#user-routes-userroutes)
-    -   [Venue Routes](#venue-routes-venueroutes)
--   [Getting Started](#getting-started)
-    -   [Prerequisites](#prerequisites)
-    -   [Installation](#installation)
--   [Running the Application](#running-the-application)
--   [Testing](#testing)
--   [Environment Variables](#environment-variables)
--   [Contributing](#contributing)
--   [License](#license)
+- [Prerequisites](#prerequisites)
+- [Environment Variables](#environment-variables)
+- [Installation](#installation)
+- [Running Locally](#running-locally)
+- [Docker](#docker)
+- [Deployment](#deployment)
+- [Database](#database)
+- [API Endpoints](#api-endpoints)
+- [Contributing](#contributing)
 
-# Outsy Backend
+## Prerequisites
 
-## Description
+- Node.js (version >= 18)
+- PostgreSQL
+- Docker (optional, for Docker deployment)
 
-The Outsy backend is a REST API built with Node.js, Express, and Prisma, providing the core logic and data management for the Outsy application. It handles user authentication, event management, chat functionality, and more.
+## Environment Variables
 
-## Technologies Used
+- `DATABASE_URL`: PostgreSQL database connection string
+- `JWT_ACCESS_SECRET`: Secret key for JWT access tokens
+- `JWT_REFRESH_SECRET`: Secret key for JWT refresh tokens
+- `ACCESS_TOKEN_EXPIRATION`: Access token expiration time
+- `REFRESH_TOKEN_EXPIRATION`: Refresh token expiration time
+- `NODE_ENV`: Environment mode (development, production)
 
--   Node.js
--   Express
--   Prisma
--   TypeScript
--   PostgreSQL
--   Jest (for testing)
+## Installation
 
-## Project Structure
+1. Clone the repository:
 
-The backend project is structured as follows:
+```bash
+git clone git@github.com:LamNgo1911/outsy-backend.git
+```
 
--   `.gitignore`: Specifies intentionally untracked files that Git should ignore.
--   `jest.config.js`: Configuration file for Jest testing framework.
--   `package-lock.json`: Records the exact versions of dependencies used in the project.
--   `package.json`: Contains metadata about the project, including dependencies and scripts.
--   `tsconfig.json`: Configuration file for the TypeScript compiler.
--   `prisma/`: Contains the Prisma schema and migrations.
-    -   `schema.prisma`: Defines the database schema.
-    -   `seed.ts`: Seeds the database with initial data.
--   `src/`: Contains the source code for the application.
-    -   `app.ts`: Main application file.
-    -   `server.ts`: Entry point for the server.
-    -   `config/`: Contains configuration files.
-        -   `prisma.ts`: Configures the Prisma client.
-    -   `controllers/`: Contains the route handlers.
-        -   `authController.ts`: Handles authentication logic.
-        -   `chatController.ts`: Handles chat logic.
-        -   `eventController.ts`: Handles event logic.
-        -   `eventLikeController.ts`: Handles event like logic.
-        -   `feedbackController.ts`: Handles feedback logic.
-        -   `matchController.ts`: Handles match logic.
-        -   `messageController.ts`: Handles message logic.
-        -   `userChatController.ts`: Handles user chat logic.
-        -   `userController.ts`: Handles user logic.
-        -   `venueController.ts`: Handles venue logic.
-    -   `error/`: Contains custom error classes.
-        -   `apiError.ts`: Defines a custom API error class.
-    -   `middlewares/`: Contains Express middlewares.
-        -   `adminCheck.ts`: Checks if the user is an admin.
-        -   `apiErrorHandler.ts`: Handles API errors.
-        -   `authMiddleware.ts`: Authenticates users.
-        -   `notFoundError.ts`: Handles 404 errors.
-        -   `validateRequest.ts`: Validates request bodies.
-    -   `routes/`: Contains the API routes.
-        -   `authRoutes.ts`: Defines authentication routes.
-        -   `chatRoutes.ts`: Defines chat routes.
-        -   `eventRoutes.ts`: Defines event routes.
-        -   `eventLikeRoutes.ts`: Defines event like routes.
-        -   `feedbackRoutes.ts`: Defines feedback routes.
-        -   `matchRoutes.ts`: Defines match routes.
-        -   `messageRoutes.ts`: Defines message routes.
-        -   `userChatRoutes.ts`: Defines user chat routes.
-        -   `userRoutes.ts`: Defines user routes.
-        -   `venueRoutes.ts`: Defines venue routes.
-    -   `services/`: Contains the business logic.
-        -   `authService.ts`: Handles authentication services.
-        -   `chatService.ts`: Handles chat services.
-        -   `eventService.ts`: Handles event services.
-        -   `eventLikeService.ts`: Handles event like services.
-        -   `feedbackService.ts`: Handles feedback services.
-        -   `matchService.ts`: Handles match services.
-        -   `messageService.ts`: Handles message services.
-        -   `userChatService.ts`: Handles user chat services.
-        -   `userService.ts`: Handles user services.
-        -   `venueService.ts`: Handles venue services.
-    -   `types/`: Contains TypeScript types.
-        -   `types.ts`: Defines shared types.
-    -   `utils/`: Contains utility functions.
-        -   `generateAccessToken.ts`: Generates access tokens.
-        -   `generateRefreshToken.ts`: Generates refresh tokens.
-        -   `Result.ts`: Defines a result type for handling success/failure.
-        -   `validation/`: Contains Zod schemas for validation.
-            -   `chatSchema.ts`: Defines Zod schema for chat validation.
-            -   `eventSchema.ts`: Defines Zod schema for event validation.
-            -   `feedbackSchema.ts`: Defines Zod schema for feedback validation.
-            -   `matchSchema.ts`: Defines Zod schema for match validation.
-            -   `messageSchema.ts`: Defines Zod schema for message validation.
-            -   `venueSchema.ts`: Defines Zod schema for venue validation.
--   `test/`: Contains the test files.
-    -   `controllers/`: Contains the controller tests.
-    -   `services/`: Contains the service tests.
+2. Navigate to the project directory:
 
-## Database Schema
+```bash
+cd outsy-backend
+```
 
-The database schema is defined using Prisma and includes the following models:
+3. Install dependencies:
 
--   `User`: Stores user information.
--   `Preference`: Stores user preferences.
--   `RefreshToken`: Stores refresh tokens for users.
--   `Chat`: Stores chat rooms between users.
--   `UserChat`: Join table for the many-to-many relationship between User and Chat.
--   `Message`: Stores messages.
--   `Feedback`: Stores feedback given by users.
--   `Event`: Stores events created by users.
--   `EventLike`: Stores likes from users to events.
--   `Match`: Stores matches between users and events.
--   `Venue`: Stores venue information.
+```bash
+npm install
+```
+
+## Running Locally
+
+1. Set up the database (see "Database" section).
+2. Configure environment variables in `.env` file.
+3. Run the development server:
+
+```bash
+npm run dev
+```
+
+## Docker
+
+1. Build the Docker image:
+
+```bash
+docker build -t your-dockerhub-username/outsy:latest .
+```
+
+2. Run the Docker container:
+
+```bash
+docker run -d -p 8000:8000 your-dockerhub-username/outsy:latest
+```
+
+## Deployment
+
+The backend is configured for CI/CD to AWS EC2 using GitHub Actions. The workflow is defined in `.github/workflows/deploy.yml`.
+
+To configure deployment:
+
+1. Set up an EC2 instance with Docker installed.
+2. Configure the necessary secrets in your GitHub repository:
+    - `DOCKERHUB_USERNAME`
+    - `DOCKERHUB_PASSWORD`
+    - `EC2_HOST`
+    - `EC2_USER`
+    - `EC2_SSH_KEY`
+    - `JWT_ACCESS_SECRET`
+    - `JWT_REFRESH_SECRET`
+    - `DATABASE_URL`
+    - `ACCESS_TOKEN_EXPIRATION`
+    - `REFRESH_TOKEN_EXPIRATION`
+
+## Database
+
+The backend uses Prisma ORM to interact with a PostgreSQL database.
+
+1.  Create a PostgreSQL database.
+2.  Set the `DATABASE_URL` environment variable to your database connection string in `.env` file.
+3.  Run Prisma migrations:
+
+    ```bash
+    npx prisma migrate dev
+    ```
+
+4.  Seed the database (optional):
+
+    ```bash
+    npm run seed
+    ```
+
+## API Endpoints
+
+(Refer to the existing API Endpoints section in the original README for details)
 
 ## API Endpoints
 
@@ -218,78 +208,6 @@ The database schema is defined using Prisma and includes the following models:
 -   `DELETE /:id`: Deletes a venue (admin only).
 -   `PUT /:id`: Updates a venue (admin only).
 
-## Getting Started
-
-### Prerequisites
-
--   Node.js (version >= 18)
--   PostgreSQL
--   Prisma CLI
-
-### Installation
-
-1.  Clone the repository:
-
-    ```bash
-    git clone git@github.com:LamNgo1911/outsy-backend.git
-    ```
-
-2.  Navigate to the project directory:
-
-    ```bash
-    cd outsy-backend
-    ```
-
-3.  Install dependencies:
-
-    ```bash
-    npm install
-    ```
-
-4.  Set up the database:
-
-    -   Create a PostgreSQL database.
-    -   Set the `DATABASE_URL` environment variable to your database connection string in `.env` file.
-
-5.  Run Prisma migrations:
-
-    ```bash
-    npx prisma migrate dev
-    ```
-
-6.  Seed the database (optional):
-
-    ```bash
-    npm run seed
-    ```
-
-### Running the Application
-
-```bash
-npm run dev
-```
-
-The server will start at `http://localhost:8000`.
-
-## Testing
-
-```bash
-npm test
-```
-
-## Environment Variables
-
--   `DATABASE_URL`: PostgreSQL database connection string.
--   `NODE_ENV`: Environment mode (development, production, etc.).
--   `JWT_ACCESS_SECRET`: Secret key for signing JWT access tokens.
--   `JWT_REFRESH_SECRET`: Secret key for signing JWT refresh tokens.
--   `ACCESS_TOKEN_EXPIRATION`: Expiration time for access tokens.
--   `REFRESH_TOKEN_EXPIRATION`: Expiration time for refresh tokens.
-
 ## Contributing
 
 Contributions are welcome! Please open a pull request with your changes.
-
-## License
-
-ISC
