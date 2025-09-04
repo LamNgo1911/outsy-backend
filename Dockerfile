@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-COPY src ./src
-
 # Generate Prisma client
 RUN npx prisma generate
 
