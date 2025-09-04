@@ -16,7 +16,7 @@ import eventLikeRouter from "./routes/eventLikeRoutes";
 import apiErrorhandler from "./middlewares/apiErrorHandler";
 import notFoundError from "./middlewares/notFoundError";
 import authRouter from "./routes/authRoutes";
-import matchRouter from "./routes/matchRoutes"
+import matchRouter from "./routes/matchRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -29,6 +29,10 @@ app.use(morgan("common")); // Log HTTP requests
 app.use(bodyParser.urlencoded({ extended: false })); // Parse URL-encoded data
 
 /* ROUTES */
+app.get("/", (req, res) => {
+  res.send("Welcome to Outsy Backend!");
+});
+
 app.get("/hello", (req, res) => {
   res.send("Hello from server");
 });
