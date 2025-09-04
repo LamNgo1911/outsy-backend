@@ -131,6 +131,7 @@ model Feedback {
   userId         String
   giverId        String
   text           String
+  createdAt      DateTime @default(now())
   lastModifiedAt DateTime @default(now()) @updatedAt
 
   user  User @relation("FeedbackRecipient", fields: [userId], references: [id])

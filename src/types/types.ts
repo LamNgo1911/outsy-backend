@@ -82,7 +82,6 @@ export interface UserInput {
 
   // Activity & Preferences
   onlineStatus?: boolean;
-  createdAt: Date;
   updatedAt: Date;
   igUrl?: string | null;
   preferences?: PreferenceInput;
