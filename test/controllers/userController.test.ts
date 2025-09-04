@@ -60,7 +60,6 @@ describe("UserController", () => {
     interests: ["reading"],
     status: Status.ACTIVE,
     role: Role.USER,
-    createdAt: new Date(),
     updatedAt: new Date(),
   };
   const mockUserUpdateInput: UserUpdateInput = {

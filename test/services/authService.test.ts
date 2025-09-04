@@ -58,7 +58,6 @@ describe("Auth Service Functions", () => {
       status: Status.ACTIVE, // Use enum
       role: Role.USER, // Use enum
       // These might be set by DB/service, ensure they are part of the input type if required
-      createdAt: new Date(), // Or mock date
       updatedAt: new Date(), // Or mock date
       // Optional fields
       bio: null,
