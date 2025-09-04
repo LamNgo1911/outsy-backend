@@ -120,10 +120,6 @@ The backend uses Prisma ORM to interact with a PostgreSQL database.
 
 ## API Endpoints
 
-(Refer to the existing API Endpoints section in the original README for details)
-
-## API Endpoints
-
 ### Authentication Routes (`authRoutes.ts`)
 
 -   `POST /signup`: Registers a new user.
@@ -207,6 +203,10 @@ The backend uses Prisma ORM to interact with a PostgreSQL database.
 -   `POST /`: Creates a new venue.
 -   `DELETE /:id`: Deletes a venue (admin only).
 -   `PUT /:id`: Updates a venue (admin only).
+
+## Deployed Application
+
+The application is deployed at: http://13.49.27.132:8000
 
 ## Contributing
 
