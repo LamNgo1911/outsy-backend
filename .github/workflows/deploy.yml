@@ -53,7 +53,7 @@ jobs:
               -e JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }} \
               -e JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }} \
               -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-              myusername/outsy:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/outsy:latest
 
 
 
