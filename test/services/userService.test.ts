@@ -60,7 +60,6 @@ describe("User Service Functions", () => {
       interests: ["reading"],
       status: Status.ACTIVE,
       role: Role.USER,
-      createdAt: new Date(),
       updatedAt: new Date(),
       onlineStatus: false,
     };

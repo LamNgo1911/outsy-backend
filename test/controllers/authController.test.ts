@@ -55,7 +55,6 @@ describe("AuthController", () => {
       interests: ["testing", "coding"],
       status: Status.ACTIVE,
       role: Role.USER,
-      createdAt: new Date(),
       updatedAt: new Date(),
     };
     const mockSignupResult = {

@@ -1,4 +1,10 @@
-import { MatchStatus, Status, Role, EventType, EventStatus } from "@prisma/client"; // ✅ Import Status properly
+import {
+  MatchStatus,
+  Status,
+  Role,
+  EventType,
+  EventStatus,
+} from "@prisma/client"; // ✅ Import Status properly
 import { EventLike, Event } from "./eventTypes"; // Import Event here
 
 // Base interfaces for common properties
@@ -50,7 +56,7 @@ export interface User {
   // Activity & Preferences
   onlineStatus: boolean;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt: Date | null;
   igUrl?: string | null;
 
   // Relations
@@ -82,7 +88,6 @@ export interface UserInput {
 
   // Activity & Preferences
   onlineStatus?: boolean;
-  createdAt: Date;
   updatedAt: Date;
   igUrl?: string | null;
   preferences?: PreferenceInput;
@@ -131,9 +136,9 @@ export interface MatchInput {
 }
 
 export interface MatchFilters {
-  status?: MatchStatus,
-  eventType?: EventType,
-  eventStatus?: EventStatus
+  status?: MatchStatus;
+  eventType?: EventType;
+  eventStatus?: EventStatus;
 }
 
 // Chat related types
