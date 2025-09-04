@@ -206,7 +206,7 @@ The backend uses Prisma ORM to interact with a PostgreSQL database.
 
 ## Deployed Application
 
-The application is deployed at: http://13.49.27.132:8000
+The application is deployed at: http://13.49.27.132:8000/api/v1
 
 ## Contributing
 
