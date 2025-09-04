@@ -68,6 +68,30 @@ npm install
 npm run dev
 ```
 
+## Testing
+
+To run the tests, use the following command:
+
+```bash
+npm test
+```
+
+1. Set up the database (see "Database" section).
+2. Configure environment variables in `.env` file.
+3. Run the development server:
+
+```bash
+npm run dev
+```
+
+## Testing
+
+To run the tests, use the following command:
+
+```bash
+npm test
+```
+
 ## Docker
 
 1. Build the Docker image:
