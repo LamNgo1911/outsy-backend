@@ -20,6 +20,7 @@ The Outsy backend is a REST API built with Node.js, TypeScript, and Express, pro
 - [Deployment](#deployment)
 - [Database](#database)
 - [API Endpoints](#api-endpoints)
+- [Testing](#testing)
 - [Contributing](#contributing)
 
 ## Prerequisites
@@ -203,6 +204,14 @@ The backend uses Prisma ORM to interact with a PostgreSQL database.
 -   `GET /api/v1/matches/user/:userId`: Retrieves matches by user ID.
 -   `PUT /api/v1/matches/:matchId`: Updates a match.
 -   `DELETE /api/v1/matches/:matchId`: Deletes a match.
+
+## Testing
+
+To run the tests, use the following command:
+
+```bash
+npm test
+```
 
 ## Deployed Application
 
